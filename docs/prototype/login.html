@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>医院自助设备管理系统 - 登录</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --bg-light: #f8fafc;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .login-container {
+      display: flex;
+      width: 900px;
+      height: 550px;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+
+    /* 左侧品牌区 */
+    .brand-section {
+      flex: 1;
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+      color: white;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .logo-area h2 {
+      font-size: 24px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .system-status {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    /* 右侧交互区 */
+    .login-section {
+      flex: 1.2;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-tabs {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .tab-item {
+      padding: 10px 20px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .tab-item.active {
+      color: var(--primary-color);
+      border-bottom: 3px solid var(--primary-color);
+      margin-bottom: -2px;
+    }
+
+    /* IC卡感应动画 */
+    .card-reader-mode {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+    }
+
+    .rfid-icon {
+      width: 80px;
+      height: 80px;
+      background: #eff6ff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .rfid-icon::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 2px solid var(--primary-color);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    /* 表单样式 */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      height: 50px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-login {
+      width: 100%;
+      height: 50px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-login:active {
+      transform: scale(0.98);
+    }
+
+    .footer-info {
+      margin-top: auto;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* 隐藏不活跃模式 */
+    .mode-content {
+      display: none;
+    }
+
+    .mode-content.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+    <div class="brand-section">
+      <div class="logo-area">
+        <h2>智慧医疗控制中心</h2>
+        <p>Advanced Kiosk Management</p>
+      </div>
+
+      <div class="system-status">
+        <span class="status-dot"></span>
+        终端编号: SZ-SH-082 | 系统在线
+      </div>
+    </div>
+
+    <div class="login-section">
+      <div class="login-tabs">
+        <div class="tab-item active" onclick="switchMode('card')">工牌感应</div>
+        <div class="tab-item" onclick="switchMode('pass')">账号密码</div>
+      </div>
+
+      <div id="mode-card" class="mode-content active">
+        <div class="card-reader-mode">
+          <div class="rfid-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+          </div>
+          <h3 style="margin-bottom: 10px;">请刷员工卡</h3>
+          <p style="color: var(--text-muted); font-size: 14px;">请将工牌靠近感应区，系统将自动登录</p>
+        </div>
+      </div>
+
+      <div id="mode-pass" class="mode-content">
+        <div class="form-group">
+          <label>工号/账号</label>
+          <input type="text" placeholder="请输入您的工号">
+        </div>
+        <div class="form-group">
+          <label>登录密码</label>
+          <input type="password" placeholder="请输入密码">
+        </div>
+        <button class="btn-login">确认登录</button>
+        <p style="text-align: center; margin-top: 15px; color: var(--primary-color); font-size: 14px; cursor: pointer;">
+          忘记密码？请联系信息科</p>
+      </div>
+
+      <div class="footer-info">
+        &copy; 2026 智慧医疗信息技术有限公司 | V2.4.0
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchMode(mode) {
+      // 切换标签
+      document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // 切换内容
+      document.querySelectorAll('.mode-content').forEach(content => content.classList.remove('active'));
+      document.getElementById('mode-' + mode).classList.add('active');
+    }
+  </script>
+
+</body>
+
+</html>
