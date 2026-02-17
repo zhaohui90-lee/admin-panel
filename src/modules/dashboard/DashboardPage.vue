@@ -2,12 +2,14 @@
 import { ref, onMounted } from 'vue'
 import { useBridge } from '@/composables/useBridge'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import type { AppConfig } from '@/bridge'
 
 const bridge = useBridge()
 const auth = useAuthStore()
+const toast = useToast()
 
 // --- 确认弹窗状态 ---
 const confirmVisible = ref(false)
@@ -28,31 +30,19 @@ async function handleConfirm() {
   confirmLoading.value = true
   try {
     await confirmAction()
-    toast.value = { message: '操作成功', type: 'success' }
+    toast.success('操作成功')
   } catch {
-    toast.value = { message: '操作失败，请重试', type: 'error' }
+    toast.error('操作失败，请重试')
   } finally {
     confirmLoading.value = false
     confirmVisible.value = false
     confirmAction = null
-    showToast()
   }
 }
 
 function handleCancel() {
   confirmVisible.value = false
   confirmAction = null
-}
-
-// --- Toast ---
-const toast = ref<{ message: string; type: 'success' | 'error' } | null>(null)
-const toastVisible = ref(false)
-
-function showToast() {
-  toastVisible.value = true
-  setTimeout(() => {
-    toastVisible.value = false
-  }, 2000)
 }
 
 // --- 配置信息 ---
@@ -90,8 +80,7 @@ async function saveServerUrl() {
     }
     serverUrlEditing.value = false
     showKeyboard.value = false
-    toast.value = { message: '服务地址已更新', type: 'success' }
-    showToast()
+    toast.success('服务地址已更新')
   } finally {
     serverUrlSaving.value = false
   }
@@ -242,28 +231,5 @@ function rebootMachine() {
     @cancel="handleCancel"
   />
 
-  <!-- Toast -->
-  <Teleport to="body">
-    <Transition name="toast">
-      <div
-        v-if="toastVisible && toast"
-        class="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 rounded-xl px-6 py-3 text-sm font-medium shadow-lg"
-        :class="toast.type === 'success' ? 'bg-accent text-deep' : 'bg-danger text-white'"
-      >
-        {{ toast.message }}
-      </div>
-    </Transition>
-  </Teleport>
-</template>
 
-<style scoped>
-.toast-enter-active,
-.toast-leave-active {
-  transition: all 0.3s ease;
-}
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translateX(-50%) translateY(20px);
-}
-</style>
+</template>
