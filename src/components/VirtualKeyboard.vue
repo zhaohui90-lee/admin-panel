@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const model = defineModel<string>({ default: '' })
 
@@ -50,16 +49,16 @@ function onSpace() {
 </script>
 
 <template>
-  <div class="w-full max-w-2xl rounded-2xl border border-border bg-surface p-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-[20px]">
+  <div class="w-full max-w-2xl rounded-xl border border-border bg-surface p-2 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:rounded-2xl sm:p-3">
     <div
       v-for="(row, rowIndex) in displayRows"
       :key="rowIndex"
-      class="mb-2 flex justify-center gap-1.5"
+      class="mb-1.5 flex justify-center gap-1 sm:mb-2 sm:gap-1.5"
     >
       <!-- Caps Lock -->
       <button
         v-if="rowIndex === 2 && !isNumberMode"
-        class="flex h-12 w-14 items-center justify-center rounded-lg text-sm font-medium transition-all duration-150"
+        class="flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-150 sm:h-12 sm:w-14 sm:rounded-lg"
         :class="
           isCaps
             ? 'bg-accent text-deep shadow-[0_0_12px_var(--color-accent-glow)]'
@@ -67,17 +66,8 @@ function onSpace() {
         "
         @click="toggleCaps"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
-            clip-rule="evenodd"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
         </svg>
       </button>
 
@@ -85,7 +75,7 @@ function onSpace() {
       <button
         v-for="key in row"
         :key="key"
-        class="flex h-12 w-12 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.06] text-base font-medium text-text-primary transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15] active:scale-95"
+        class="flex h-10 w-8 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] text-sm font-medium text-text-primary transition-all duration-150 hover:bg-white/[0.1] active:scale-95 active:bg-white/[0.15] sm:h-12 sm:w-12 sm:rounded-lg sm:text-base"
         @click="onKey(key)"
       >
         {{ key }}
@@ -94,28 +84,19 @@ function onSpace() {
       <!-- Backspace -->
       <button
         v-if="rowIndex === 2"
-        class="flex h-12 w-14 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.06] text-text-secondary transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15]"
+        class="flex h-10 w-10 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] text-text-secondary transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15] sm:h-12 sm:w-14 sm:rounded-lg"
         @click="onBackspace"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v6a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4.415-4.414a1 1 0 010-1.414l4.414-4.414zm4 2.414a1 1 0 00-1.414 1.414L10.586 10l-1.293 1.293a1 1 0 101.414 1.414L12 11.414l1.293 1.293a1 1 0 001.414-1.414L13.414 10l1.293-1.293a1 1 0 00-1.414-1.414L12 8.586l-1.293-1.293z"
-            clip-rule="evenodd"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v6a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4.415-4.414a1 1 0 010-1.414l4.414-4.414zm4 2.414a1 1 0 00-1.414 1.414L10.586 10l-1.293 1.293a1 1 0 101.414 1.414L12 11.414l1.293 1.293a1 1 0 001.414-1.414L13.414 10l1.293-1.293a1 1 0 00-1.414-1.414L12 8.586l-1.293-1.293z" clip-rule="evenodd" />
         </svg>
       </button>
     </div>
 
     <!-- Bottom row -->
-    <div class="flex justify-center gap-1.5">
+    <div class="flex justify-center gap-1 sm:gap-1.5">
       <button
-        class="flex h-12 w-20 items-center justify-center rounded-lg text-sm font-medium transition-all duration-150"
+        class="flex h-10 w-16 items-center justify-center rounded-md text-xs font-medium transition-all duration-150 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
         :class="
           isNumberMode
             ? 'bg-accent text-deep shadow-[0_0_12px_var(--color-accent-glow)]'
@@ -127,14 +108,14 @@ function onSpace() {
       </button>
 
       <button
-        class="flex h-12 flex-1 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.06] text-sm text-text-muted transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15]"
+        class="flex h-10 flex-1 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] text-xs text-text-muted transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15] sm:h-12 sm:rounded-lg sm:text-sm"
         @click="onSpace"
       >
         空格
       </button>
 
       <button
-        class="flex h-12 w-20 items-center justify-center rounded-lg bg-danger-dim text-sm font-medium text-danger transition-all duration-150 hover:bg-danger/20 active:bg-danger/25"
+        class="flex h-10 w-16 items-center justify-center rounded-md bg-danger-dim text-xs font-medium text-danger transition-all duration-150 hover:bg-danger/20 active:bg-danger/25 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
         @click="onClear"
       >
         清空
