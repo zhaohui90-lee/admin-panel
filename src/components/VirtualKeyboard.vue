@@ -49,7 +49,7 @@ function onSpace() {
 </script>
 
 <template>
-  <div class="w-full max-w-2xl rounded-xl border border-border bg-surface p-2 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:rounded-2xl sm:p-3">
+  <div class="w-full max-w-2xl rounded-xl border border-border bg-card p-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)] sm:rounded-2xl sm:p-3">
     <div
       v-for="(row, rowIndex) in displayRows"
       :key="rowIndex"
@@ -61,8 +61,8 @@ function onSpace() {
         class="flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-150 sm:h-12 sm:w-14 sm:rounded-lg"
         :class="
           isCaps
-            ? 'bg-accent text-deep shadow-[0_0_12px_var(--color-accent-glow)]'
-            : 'border border-white/[0.08] bg-white/[0.06] text-text-secondary hover:bg-white/[0.1] active:bg-white/[0.15]'
+            ? 'bg-accent text-white'
+            : 'border border-border bg-surface text-text-secondary hover:bg-gray-100 active:bg-gray-200'
         "
         @click="toggleCaps"
       >
@@ -75,7 +75,7 @@ function onSpace() {
       <button
         v-for="key in row"
         :key="key"
-        class="flex h-10 w-8 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] text-sm font-medium text-text-primary transition-all duration-150 hover:bg-white/[0.1] active:scale-95 active:bg-white/[0.15] sm:h-12 sm:w-12 sm:rounded-lg sm:text-base"
+        class="flex h-10 w-8 items-center justify-center rounded-md border border-border bg-surface text-sm font-medium text-text-primary transition-all duration-150 hover:bg-gray-100 active:scale-95 active:bg-gray-200 sm:h-12 sm:w-12 sm:rounded-lg sm:text-base"
         @click="onKey(key)"
       >
         {{ key }}
@@ -84,7 +84,7 @@ function onSpace() {
       <!-- Backspace -->
       <button
         v-if="rowIndex === 2"
-        class="flex h-10 w-10 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] text-text-secondary transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15] sm:h-12 sm:w-14 sm:rounded-lg"
+        class="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-text-secondary transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-12 sm:w-14 sm:rounded-lg"
         @click="onBackspace"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -99,8 +99,8 @@ function onSpace() {
         class="flex h-10 w-16 items-center justify-center rounded-md text-xs font-medium transition-all duration-150 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
         :class="
           isNumberMode
-            ? 'bg-accent text-deep shadow-[0_0_12px_var(--color-accent-glow)]'
-            : 'border border-white/[0.08] bg-white/[0.06] text-text-secondary hover:bg-white/[0.1] active:bg-white/[0.15]'
+            ? 'bg-accent text-white'
+            : 'border border-border bg-surface text-text-secondary hover:bg-gray-100 active:bg-gray-200'
         "
         @click="toggleNumberMode"
       >
@@ -108,14 +108,14 @@ function onSpace() {
       </button>
 
       <button
-        class="flex h-10 flex-1 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.06] text-xs text-text-muted transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15] sm:h-12 sm:rounded-lg sm:text-sm"
+        class="flex h-10 flex-1 items-center justify-center rounded-md border border-border bg-surface text-xs text-text-muted transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-12 sm:rounded-lg sm:text-sm"
         @click="onSpace"
       >
         空格
       </button>
 
       <button
-        class="flex h-10 w-16 items-center justify-center rounded-md bg-danger-dim text-xs font-medium text-danger transition-all duration-150 hover:bg-danger/20 active:bg-danger/25 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
+        class="flex h-10 w-16 items-center justify-center rounded-md border border-red-200 bg-red-50 text-xs font-medium text-red-600 transition-all duration-150 hover:bg-red-100 active:bg-red-200 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
         @click="onClear"
       >
         清空

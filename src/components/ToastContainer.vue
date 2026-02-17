@@ -13,9 +13,9 @@ const { toasts, remove } = useToast()
           :key="t.id"
           class="flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium shadow-lg backdrop-blur-sm cursor-pointer"
           :class="{
-            'bg-accent text-deep': t.type === 'success',
+            'bg-emerald-500 text-white': t.type === 'success',
             'bg-danger text-white': t.type === 'error',
-            'bg-warning text-deep': t.type === 'warning',
+            'bg-amber-500 text-white': t.type === 'warning',
           }"
           @click="remove(t.id)"
         >

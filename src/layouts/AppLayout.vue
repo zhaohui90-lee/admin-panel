@@ -57,21 +57,21 @@ function handleLogout() {
 
     <!-- Sidebar -->
     <nav
-      class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 -translate-x-full flex-col border-r border-border bg-[rgba(10,16,30,0.97)] backdrop-blur-xl transition-transform duration-300 lg:relative lg:z-10 lg:w-60 lg:translate-x-0 xl:w-64"
+      class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 -translate-x-full flex-col border-r border-sidebar-border bg-sidebar transition-transform duration-300 lg:relative lg:z-10 lg:w-60 lg:translate-x-0 xl:w-64"
       :class="{ 'translate-x-0': sidebarOpen }"
     >
       <!-- Brand -->
       <div class="flex items-center gap-3 px-5 pt-6 pb-7 lg:px-4 lg:pt-5 lg:pb-6 xl:px-5">
-        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[linear-gradient(135deg,var(--color-accent),#00b884)] shadow-[0_0_16px_var(--color-accent-glow)]">
-          <svg class="h-4.5 w-4.5 text-deep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-accent">
+          <svg class="h-4.5 w-4.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
           </svg>
         </div>
-        <span class="text-sm font-semibold tracking-wide text-text-primary lg:text-[15px]">管理控制台</span>
+        <span class="text-sm font-semibold tracking-wide text-white lg:text-[15px]">管理控制台</span>
       </div>
 
       <!-- Nav label -->
-      <div class="mb-2 px-7 font-mono text-[10px] tracking-[2px] text-text-muted uppercase lg:px-6 xl:px-7">主菜单</div>
+      <div class="mb-2 px-7 font-mono text-[10px] tracking-[2px] text-sidebar-text-muted uppercase lg:px-6 xl:px-7">主菜单</div>
 
       <!-- Nav items -->
       <div class="flex flex-col gap-1 px-3 lg:px-2 xl:px-3">
@@ -80,12 +80,12 @@ function handleLogout() {
           :key="item.to"
           class="relative flex items-center gap-3 rounded-[10px] px-4 py-2.5 text-[13.5px] font-medium transition-all duration-200"
           :class="isActive(item.to)
-            ? 'bg-accent-dim text-accent'
-            : 'text-text-secondary hover:bg-white/[0.04] hover:text-text-primary'"
+            ? 'bg-sidebar-active text-white'
+            : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white'"
           @click="navigateTo(item.to)"
         >
           <!-- Active indicator -->
-          <div v-if="isActive(item.to)" class="absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-r-sm bg-accent" />
+          <div v-if="isActive(item.to)" class="absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-r-sm bg-white" />
 
           <!-- Activity icon -->
           <svg v-if="item.icon === 'activity'" class="h-4.5 w-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -101,12 +101,12 @@ function handleLogout() {
       <div class="flex-1" />
 
       <!-- Divider -->
-      <div class="mx-5 mb-3 h-px bg-border lg:mx-4 xl:mx-5" />
+      <div class="mx-5 mb-3 h-px bg-sidebar-border lg:mx-4 xl:mx-5" />
 
       <!-- Logout -->
       <div class="px-3 pb-5 lg:px-2 lg:pb-4 xl:px-3 xl:pb-5">
         <button
-          class="flex w-full items-center gap-3 rounded-[10px] px-4 py-2.5 text-[13.5px] text-danger transition-all duration-200 hover:bg-danger-dim"
+          class="flex w-full items-center gap-3 rounded-[10px] px-4 py-2.5 text-[13.5px] text-red-400 transition-all duration-200 hover:bg-red-500/10"
           @click="handleLogout"
         >
           <svg class="h-4.5 w-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -118,9 +118,9 @@ function handleLogout() {
     <!-- Main Content -->
     <main class="relative flex flex-1 flex-col overflow-hidden">
       <!-- Mobile top bar -->
-      <header class="flex h-14 shrink-0 items-center border-b border-border bg-[rgba(10,16,30,0.8)] px-4 backdrop-blur-lg lg:hidden">
+      <header class="flex h-14 shrink-0 items-center border-b border-border bg-white/80 px-4 backdrop-blur-lg lg:hidden">
         <button
-          class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-white/[0.06] hover:text-text-primary"
+          class="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-gray-100 hover:text-text-primary"
           @click="sidebarOpen = true"
         >
           <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -130,11 +130,7 @@ function handleLogout() {
 
       <!-- Content area -->
       <div class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-        <!-- Ambient glow -->
-        <div class="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_800px_600px_at_70%_20%,rgba(0,229,160,0.025),transparent),radial-gradient(ellipse_600px_400px_at_20%_80%,rgba(59,130,246,0.02),transparent)]" />
-        <div class="relative z-10">
-          <router-view />
-        </div>
+        <router-view />
       </div>
     </main>
   </div>
