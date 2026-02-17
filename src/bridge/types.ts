@@ -55,6 +55,34 @@ export interface HardwareTestResult {
   timestamp: number
 }
 
+/** 日志级别 */
+export type LogLevel = 'info' | 'warn' | 'error'
+
+/** 单条日志记录 */
+export interface LogEntry {
+  id: string
+  timestamp: number
+  level: LogLevel
+  source: string
+  message: string
+}
+
+/** 日志查询参数 */
+export interface LogQuery {
+  level?: LogLevel
+  keyword?: string
+  page: number
+  pageSize: number
+}
+
+/** 日志查询结果 */
+export interface LogPage {
+  items: LogEntry[]
+  total: number
+  page: number
+  pageSize: number
+}
+
 /** 前端唯一使用的 Bridge 接口 */
 export interface IBridge {
   auth: {
@@ -72,6 +100,9 @@ export interface IBridge {
   }
   business: {
     reloadPage(token: string): Promise<void>
+  }
+  logs: {
+    getLogs(token: string, query: LogQuery): Promise<LogPage>
   }
   hardware: {
     getDevices(token: string): Promise<HardwareDeviceInfo[]>

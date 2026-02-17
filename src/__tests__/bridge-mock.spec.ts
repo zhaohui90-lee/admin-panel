@@ -65,6 +65,37 @@ describe('Mock Bridge', () => {
     })
   })
 
+  describe('logs', () => {
+    it('getLogs returns paginated results', async () => {
+      const result = await bridge.logs.getLogs('fake-token', { page: 1, pageSize: 10 })
+      expect(result.items.length).toBeGreaterThan(0)
+      expect(result.items.length).toBeLessThanOrEqual(10)
+      expect(result.total).toBeGreaterThan(0)
+      expect(result.page).toBe(1)
+      expect(result.pageSize).toBe(10)
+    })
+
+    it('getLogs filters by level', async () => {
+      const result = await bridge.logs.getLogs('fake-token', { level: 'error', page: 1, pageSize: 50 })
+      expect(result.items.every((l) => l.level === 'error')).toBe(true)
+    })
+
+    it('getLogs filters by keyword', async () => {
+      const result = await bridge.logs.getLogs('fake-token', { keyword: '交易', page: 1, pageSize: 50 })
+      expect(result.items.every((l) => l.message.includes('交易') || l.source.includes('交易'))).toBe(true)
+    })
+
+    it('log entries have required fields', async () => {
+      const result = await bridge.logs.getLogs('fake-token', { page: 1, pageSize: 1 })
+      const log = result.items[0]
+      expect(log).toHaveProperty('id')
+      expect(log).toHaveProperty('timestamp')
+      expect(log).toHaveProperty('level')
+      expect(log).toHaveProperty('source')
+      expect(log).toHaveProperty('message')
+    })
+  })
+
   describe('hardware', () => {
     it('getDevices returns device list', async () => {
       const devices = await bridge.hardware.getDevices('fake-token')

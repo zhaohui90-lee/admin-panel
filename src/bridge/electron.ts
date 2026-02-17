@@ -81,6 +81,13 @@ export function createElectronBridge(): IBridge {
       },
     },
 
+    logs: {
+      async getLogs(_token: string, _query: import('./types').LogQuery) {
+        // TODO: wire to adminAPI.getLogs when IPC is ready
+        return { items: [], total: 0, page: 1, pageSize: 20 }
+      },
+    },
+
     hardware: {
       async getDevices(_token: string) {
         // TODO: wire to adminAPI.getDevices when IPC is ready
