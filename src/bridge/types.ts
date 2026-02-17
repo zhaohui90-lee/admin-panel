@@ -41,6 +41,20 @@ export interface AppConfig {
   version: string
 }
 
+/** 硬件设备信息 */
+export interface HardwareDeviceInfo {
+  id: string
+  name: string
+  connected: boolean
+}
+
+/** 硬件测试结果 */
+export interface HardwareTestResult {
+  success: boolean
+  output: string
+  timestamp: number
+}
+
 /** 前端唯一使用的 Bridge 接口 */
 export interface IBridge {
   auth: {
@@ -58,5 +72,11 @@ export interface IBridge {
   }
   business: {
     reloadPage(token: string): Promise<void>
+  }
+  hardware: {
+    getDevices(token: string): Promise<HardwareDeviceInfo[]>
+    connectDevice(token: string, deviceId: string): Promise<void>
+    disconnectDevice(token: string, deviceId: string): Promise<void>
+    testDevice(token: string, deviceId: string, command: string): Promise<HardwareTestResult>
   }
 }

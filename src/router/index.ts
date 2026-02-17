@@ -38,6 +38,11 @@ const router = createRouter({
           name: 'reports',
           component: () => import('@/modules/reports/ReportsPage.vue'),
         },
+        {
+          path: 'hardware',
+          name: 'hardware',
+          component: () => import('@/modules/hardware/HardwarePage.vue'),
+        },
       ],
     },
   ],

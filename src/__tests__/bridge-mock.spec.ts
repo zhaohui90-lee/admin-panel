@@ -64,4 +64,29 @@ describe('Mock Bridge', () => {
       await expect(bridge.business.reloadPage('fake-token')).resolves.toBeUndefined()
     })
   })
+
+  describe('hardware', () => {
+    it('getDevices returns device list', async () => {
+      const devices = await bridge.hardware.getDevices('fake-token')
+      expect(devices.length).toBeGreaterThan(0)
+      expect(devices[0]).toHaveProperty('id')
+      expect(devices[0]).toHaveProperty('name')
+      expect(devices[0]).toHaveProperty('connected')
+    })
+
+    it('connectDevice resolves without error', async () => {
+      await expect(bridge.hardware.connectDevice('fake-token', 'printer')).resolves.toBeUndefined()
+    })
+
+    it('disconnectDevice resolves without error', async () => {
+      await expect(bridge.hardware.disconnectDevice('fake-token', 'printer')).resolves.toBeUndefined()
+    })
+
+    it('testDevice returns result with output', async () => {
+      const result = await bridge.hardware.testDevice('fake-token', 'printer', 'status')
+      expect(result.success).toBe(true)
+      expect(result.output).toBeTruthy()
+      expect(result.timestamp).toBeGreaterThan(0)
+    })
+  })
 })

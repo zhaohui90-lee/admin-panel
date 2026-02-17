@@ -80,5 +80,22 @@ export function createElectronBridge(): IBridge {
         unwrapVoid(await api.reloadBusiness(token))
       },
     },
+
+    hardware: {
+      async getDevices(_token: string) {
+        // TODO: wire to adminAPI.getDevices when IPC is ready
+        return []
+      },
+      async connectDevice(_token: string, _deviceId: string) {
+        // TODO: wire to adminAPI.connectDevice
+      },
+      async disconnectDevice(_token: string, _deviceId: string) {
+        // TODO: wire to adminAPI.disconnectDevice
+      },
+      async testDevice(_token: string, _deviceId: string, _command: string) {
+        // TODO: wire to adminAPI.testDevice
+        return { success: false, output: 'IPC not implemented', timestamp: Date.now() }
+      },
+    },
   }
 }

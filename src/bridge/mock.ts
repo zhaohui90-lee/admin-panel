@@ -1,4 +1,4 @@
-import type { IBridge, SystemInfo, AppConfig } from './types'
+import type { IBridge, SystemInfo, AppConfig, HardwareDeviceInfo, HardwareTestResult } from './types'
 
 const MOCK_TOKEN = 'mock-token-' + Math.random().toString(36).slice(2)
 
@@ -63,6 +63,40 @@ export function createMockBridge(): IBridge {
       async reloadPage(_token: string) {
         await delay(500)
         console.log('[mock] reloadPage')
+      },
+    },
+
+    hardware: {
+      async getDevices(_token: string): Promise<HardwareDeviceInfo[]> {
+        await delay(200)
+        return [
+          { id: 'printer', name: '凭条打印机', connected: true },
+          { id: 'card-reader', name: '医保卡读卡器', connected: true },
+          { id: 'card-dispenser', name: '发卡模块', connected: false },
+          { id: 'camera', name: '人脸识别相机', connected: true },
+        ]
+      },
+
+      async connectDevice(_token: string, deviceId: string): Promise<void> {
+        await delay(500)
+        console.log(`[mock] connectDevice: ${deviceId}`)
+      },
+
+      async disconnectDevice(_token: string, deviceId: string): Promise<void> {
+        await delay(300)
+        console.log(`[mock] disconnectDevice: ${deviceId}`)
+      },
+
+      async testDevice(_token: string, deviceId: string, command: string): Promise<HardwareTestResult> {
+        await delay(800)
+        console.log(`[mock] testDevice: ${deviceId} -> ${command}`)
+        const responses: Record<string, string> = {
+          status: `[${deviceId}] 设备状态: 正常\n固件版本: v3.2.1\n运行时间: 72h`,
+          reset: `[${deviceId}] 设备已重置\n自检通过: OK`,
+          test: `[${deviceId}] 执行自检...\n通信测试: PASS\n功能测试: PASS\n响应时间: 12ms`,
+        }
+        const output = responses[command] ?? `[${deviceId}] 执行命令: ${command}\n返回: OK`
+        return { success: true, output, timestamp: Date.now() }
       },
     },
   }

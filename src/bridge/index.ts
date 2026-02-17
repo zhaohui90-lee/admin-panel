@@ -11,4 +11,4 @@ export function getBridge(): IBridge {
   return bridge
 }
 
-export type { IBridge, LoginResult, SystemInfo, AppConfig } from './types'
+export type { IBridge, LoginResult, SystemInfo, AppConfig, HardwareDeviceInfo, HardwareTestResult } from './types'
