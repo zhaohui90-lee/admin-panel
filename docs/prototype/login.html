@@ -5,205 +5,539 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>医院自助设备管理系统 - 登录</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #2563eb;
-      --bg-light: #f8fafc;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --border-radius: 12px;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    :root {
+      --bg-deep: #060b18;
+      --bg-surface: #0d1526;
+      --bg-card: rgba(13, 21, 38, 0.7);
+      --border: rgba(0, 229, 160, 0.12);
+      --border-hover: rgba(0, 229, 160, 0.3);
+      --accent: #00e5a0;
+      --accent-dim: rgba(0, 229, 160, 0.15);
+      --accent-glow: rgba(0, 229, 160, 0.4);
+      --blue: #3b82f6;
+      --blue-dim: rgba(59, 130, 246, 0.15);
+      --text-primary: #e8ecf4;
+      --text-secondary: #7a8ba8;
+      --text-muted: #4a5568;
+      --danger: #f43f5e;
+      --warning: #fbbf24;
     }
 
     body {
-      background-color: var(--bg-light);
+      font-family: 'Sora', sans-serif;
+      background: var(--bg-deep);
       height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      color: var(--text-primary);
+    }
+
+    /* Ambient background effects */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(ellipse 600px 400px at 20% 50%, rgba(0, 229, 160, 0.04), transparent),
+        radial-gradient(ellipse 500px 500px at 80% 30%, rgba(59, 130, 246, 0.03), transparent);
+      pointer-events: none;
+    }
+
+    /* Subtle grid overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 160, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 160, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
     }
 
     .login-container {
       display: flex;
-      width: 900px;
-      height: 550px;
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      width: 960px;
+      height: 580px;
+      border-radius: 20px;
       overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      backdrop-filter: blur(40px);
+      box-shadow:
+        0 0 80px rgba(0, 229, 160, 0.03),
+        0 25px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      position: relative;
+      z-index: 1;
+      animation: containerIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
-    /* 左侧品牌区 */
-    .brand-section {
-      flex: 1;
-      background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-      color: white;
-      padding: 40px;
+    @keyframes containerIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Left Brand Panel */
+    .brand-panel {
+      width: 380px;
+      background: linear-gradient(160deg, #0a1628 0%, #0d1f3c 50%, #071222 100%);
+      padding: 44px 36px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      position: relative;
+      overflow: hidden;
     }
 
-    .logo-area h2 {
-      font-size: 24px;
-      letter-spacing: 1px;
+    .brand-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--border-hover), transparent);
+    }
+
+    .brand-panel::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 300px;
+      height: 300px;
+      border: 1px solid rgba(0, 229, 160, 0.06);
+      border-radius: 50%;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
       margin-bottom: 8px;
     }
 
-    .system-status {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
+    .logo-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #00b884);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .logo-mark svg {
+      width: 24px;
+      height: 24px;
+      color: var(--bg-deep);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #ffffff 0%, #a0c4ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
+      margin-left: 58px;
+    }
+
+    .brand-features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(0, 229, 160, 0.04);
+      border: 1px solid rgba(0, 229, 160, 0.06);
+      animation: featureIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .feature-item:nth-child(1) { animation-delay: 0.3s; }
+    .feature-item:nth-child(2) { animation-delay: 0.4s; }
+    .feature-item:nth-child(3) { animation-delay: 0.5s; }
+
+    @keyframes featureIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
       border-radius: 8px;
-      font-size: 14px;
+      background: var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .feature-icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent);
+    }
+
+    .feature-text {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .terminal-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      position: relative;
+      z-index: 1;
     }
 
     .status-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: #4ade80;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      margin-right: 8px;
-    }
-
-    /* 右侧交互区 */
-    .login-section {
-      flex: 1.2;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .login-tabs {
-      display: flex;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #f1f5f9;
-    }
-
-    .tab-item {
-      padding: 10px 20px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-weight: 600;
-      transition: 0.3s;
-    }
-
-    .tab-item.active {
-      color: var(--primary-color);
-      border-bottom: 3px solid var(--primary-color);
-      margin-bottom: -2px;
-    }
-
-    /* IC卡感应动画 */
-    .card-reader-mode {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      text-align: center;
-    }
-
-    .rfid-icon {
-      width: 80px;
-      height: 80px;
-      background: #eff6ff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
       position: relative;
     }
 
-    .rfid-icon::after {
-      content: "";
+    .status-dot::after {
+      content: '';
       position: absolute;
-      width: 100%;
-      height: 100%;
-      border: 2px solid var(--primary-color);
+      inset: -3px;
       border-radius: 50%;
-      animation: pulse 1.5s infinite;
+      border: 1px solid var(--accent);
+      animation: dotPulse 2s ease-out infinite;
     }
 
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(1.5);
-        opacity: 0;
-      }
+    @keyframes dotPulse {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(2.2); opacity: 0; }
     }
 
-    /* 表单样式 */
+    /* Right Interactive Panel */
+    .interact-panel {
+      flex: 1;
+      padding: 44px 40px 32px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, rgba(13, 21, 38, 0.3) 0%, rgba(6, 11, 24, 0.5) 100%);
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-bottom: 36px;
+    }
+
+    .tab-item {
+      flex: 1;
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 9px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .tab-item:hover:not(.active) {
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-item.active {
+      color: var(--bg-deep);
+      background: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+
+    /* Mode Contents */
+    .mode-content {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .mode-content.active {
+      display: flex;
+      animation: modeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes modeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* NFC Card Mode */
+    .nfc-ring {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .nfc-ring-circle {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent);
+      opacity: 0;
+      animation: nfcPulse 3s ease-out infinite;
+    }
+
+    .nfc-ring-circle:nth-child(2) { animation-delay: 1s; }
+    .nfc-ring-circle:nth-child(3) { animation-delay: 2s; }
+
+    @keyframes nfcPulse {
+      0% { transform: scale(0.6); opacity: 0.6; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+
+    .nfc-icon-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nfc-icon-inner {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1.5px solid rgba(0, 229, 160, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nfc-icon-inner svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+    }
+
+    .mode-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .mode-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Face Recognition Mode */
+    .face-scanner {
+      width: 140px;
+      height: 140px;
+      border-radius: 20px;
+      position: relative;
+      margin-bottom: 28px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1.5px solid rgba(0, 229, 160, 0.15);
+      overflow: hidden;
+    }
+
+    .face-corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+    }
+
+    .face-corner::before, .face-corner::after {
+      content: '';
+      position: absolute;
+      background: var(--accent);
+    }
+
+    .face-corner.tl { top: 8px; left: 8px; }
+    .face-corner.tl::before { width: 2px; height: 20px; }
+    .face-corner.tl::after { width: 20px; height: 2px; }
+
+    .face-corner.tr { top: 8px; right: 8px; }
+    .face-corner.tr::before { width: 2px; height: 20px; right: 0; }
+    .face-corner.tr::after { width: 20px; height: 2px; right: 0; }
+
+    .face-corner.bl { bottom: 8px; left: 8px; }
+    .face-corner.bl::before { width: 2px; height: 20px; bottom: 0; }
+    .face-corner.bl::after { width: 20px; height: 2px; bottom: 0; }
+
+    .face-corner.br { bottom: 8px; right: 8px; }
+    .face-corner.br::before { width: 2px; height: 20px; right: 0; bottom: 0; }
+    .face-corner.br::after { width: 20px; height: 2px; right: 0; bottom: 0; }
+
+    .scan-line {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      box-shadow: 0 0 15px var(--accent-glow);
+      animation: scanMove 2.5s ease-in-out infinite;
+    }
+
+    @keyframes scanMove {
+      0%, 100% { top: 15px; }
+      50% { top: calc(100% - 15px); }
+    }
+
+    .face-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .face-icon svg {
+      width: 48px;
+      height: 48px;
+      color: rgba(0, 229, 160, 0.25);
+    }
+
+    /* Password Mode */
+    #mode-pass.active {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+    }
+
     .form-group {
       margin-bottom: 20px;
     }
 
-    .form-group label {
+    .form-label {
       display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
       margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: 'Sora', sans-serif;
       font-size: 14px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input::placeholder {
       color: var(--text-muted);
     }
 
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      height: 50px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-      transition: 0.2s;
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim), 0 0 20px rgba(0, 229, 160, 0.05);
     }
 
-    input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    .btn-login {
+    .login-btn {
       width: 100%;
-      height: 50px;
-      background: var(--primary-color);
-      color: white;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent), #00b884);
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 10px;
+      color: var(--bg-deep);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
+      transition: all 0.25s ease;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
     }
 
-    .btn-login:active {
-      transform: scale(0.98);
+    .login-btn:hover {
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transform: translateY(-1px);
     }
 
-    .footer-info {
-      margin-top: auto;
-      font-size: 12px;
-      color: #94a3b8;
+    .login-btn:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .forgot-link {
       text-align: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s;
     }
 
-    /* 隐藏不活跃模式 */
-    .mode-content {
-      display: none;
+    .forgot-link:hover {
+      color: var(--accent);
     }
 
-    .mode-content.active {
-      display: block;
+    /* Footer */
+    .login-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
@@ -211,69 +545,129 @@
 <body>
 
   <div class="login-container">
-    <div class="brand-section">
-      <div class="logo-area">
-        <h2>智慧医疗控制中心</h2>
-        <p>Advanced Kiosk Management</p>
+    <!-- Left Brand Panel -->
+    <div class="brand-panel">
+      <div>
+        <div class="brand-logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">智慧医疗控制中心</div>
+          </div>
+        </div>
+        <div class="brand-subtitle">Advanced Kiosk Mgmt</div>
       </div>
 
-      <div class="system-status">
-        <span class="status-dot"></span>
-        终端编号: SZ-SH-082 | 系统在线
+      <div class="brand-features">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="feature-text">端到端数据加密传输</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="feature-text">实时设备状态监控</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="feature-text">符合医疗信息安全标准</div>
+        </div>
+      </div>
+
+      <div class="terminal-badge">
+        <div class="status-dot"></div>
+        <span>终端 SZ-SH-082 &nbsp;|&nbsp; 系统在线</span>
       </div>
     </div>
 
-    <div class="login-section">
-      <div class="login-tabs">
-        <div class="tab-item active" onclick="switchMode('card')">工牌感应</div>
-        <div class="tab-item" onclick="switchMode('pass')">账号密码</div>
+    <!-- Right Interactive Panel -->
+    <div class="interact-panel">
+      <div class="tab-bar">
+        <div class="tab-item active" data-mode="card" onclick="switchMode('card')">工牌感应</div>
+        <div class="tab-item" data-mode="face" onclick="switchMode('face')">刷脸登录</div>
+        <div class="tab-item" data-mode="pass" onclick="switchMode('pass')">账号密码</div>
       </div>
 
+      <!-- NFC Card Mode -->
       <div id="mode-card" class="mode-content active">
-        <div class="card-reader-mode">
-          <div class="rfid-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
-              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-              <line x1="2" y1="10" x2="22" y2="10"></line>
+        <div class="nfc-ring">
+          <div class="nfc-ring-circle"></div>
+          <div class="nfc-ring-circle"></div>
+          <div class="nfc-ring-circle"></div>
+          <div class="nfc-icon-wrap">
+            <div class="nfc-icon-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="mode-title">请刷员工卡</div>
+        <div class="mode-desc">将工牌靠近感应区，系统将自动完成身份验证</div>
+      </div>
+
+      <!-- Face Recognition Mode -->
+      <div id="mode-face" class="mode-content">
+        <div class="face-scanner">
+          <div class="face-corner tl"></div>
+          <div class="face-corner tr"></div>
+          <div class="face-corner bl"></div>
+          <div class="face-corner br"></div>
+          <div class="scan-line"></div>
+          <div class="face-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+              <circle cx="12" cy="10" r="4"/>
+              <path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
             </svg>
           </div>
-          <h3 style="margin-bottom: 10px;">请刷员工卡</h3>
-          <p style="color: var(--text-muted); font-size: 14px;">请将工牌靠近感应区，系统将自动登录</p>
         </div>
+        <div class="mode-title">人脸识别中</div>
+        <div class="mode-desc">请正对摄像头，保持面部清晰可见</div>
       </div>
 
+      <!-- Password Mode -->
       <div id="mode-pass" class="mode-content">
-        <div class="form-group">
-          <label>工号/账号</label>
-          <input type="text" placeholder="请输入您的工号">
+        <div style="width: 100%;">
+          <div class="form-group">
+            <label class="form-label">工号 / 账号</label>
+            <input type="text" class="form-input" placeholder="请输入您的工号">
+          </div>
+          <div class="form-group">
+            <label class="form-label">登录密码</label>
+            <input type="password" class="form-input" placeholder="请输入密码">
+          </div>
+          <button class="login-btn">确认登录</button>
+          <div class="forgot-link">忘记密码？请联系信息科</div>
         </div>
-        <div class="form-group">
-          <label>登录密码</label>
-          <input type="password" placeholder="请输入密码">
-        </div>
-        <button class="btn-login">确认登录</button>
-        <p style="text-align: center; margin-top: 15px; color: var(--primary-color); font-size: 14px; cursor: pointer;">
-          忘记密码？请联系信息科</p>
       </div>
 
-      <div class="footer-info">
-        &copy; 2026 智慧医疗信息技术有限公司 | V2.4.0
-      </div>
+      <div class="login-footer">&copy; 2026 智慧医疗信息技术有限公司 &middot; V2.4.0</div>
     </div>
   </div>
 
   <script>
     function switchMode(mode) {
-      // 切换标签
-      document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
-      event.target.classList.add('active');
-
-      // 切换内容
-      document.querySelectorAll('.mode-content').forEach(content => content.classList.remove('active'));
-      document.getElementById('mode-' + mode).classList.add('active');
+      document.querySelectorAll('.tab-item').forEach(function(tab) {
+        tab.classList.toggle('active', tab.dataset.mode === mode);
+      });
+      document.querySelectorAll('.mode-content').forEach(function(el) {
+        el.classList.remove('active');
+      });
+      var target = document.getElementById('mode-' + mode);
+      requestAnimationFrame(function() {
+        target.classList.add('active');
+      });
     }
   </script>
 
 </body>
-
 </html>
