@@ -50,7 +50,7 @@ function onSpace() {
 </script>
 
 <template>
-  <div class="w-full max-w-2xl rounded-2xl bg-gray-200 p-3 shadow-lg">
+  <div class="w-full max-w-2xl rounded-2xl border border-border bg-surface p-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-[20px]">
     <div
       v-for="(row, rowIndex) in displayRows"
       :key="rowIndex"
@@ -59,11 +59,11 @@ function onSpace() {
       <!-- Caps Lock -->
       <button
         v-if="rowIndex === 2 && !isNumberMode"
-        class="flex h-12 w-14 items-center justify-center rounded-lg text-sm font-medium transition-colors"
+        class="flex h-12 w-14 items-center justify-center rounded-lg text-sm font-medium transition-all duration-150"
         :class="
           isCaps
-            ? 'bg-blue-500 text-white shadow-md'
-            : 'bg-white text-gray-700 shadow hover:bg-gray-50 active:bg-gray-200'
+            ? 'bg-accent text-deep shadow-[0_0_12px_var(--color-accent-glow)]'
+            : 'border border-white/[0.08] bg-white/[0.06] text-text-secondary hover:bg-white/[0.1] active:bg-white/[0.15]'
         "
         @click="toggleCaps"
       >
@@ -85,7 +85,7 @@ function onSpace() {
       <button
         v-for="key in row"
         :key="key"
-        class="flex h-12 w-12 items-center justify-center rounded-lg bg-white text-base font-medium text-gray-800 shadow transition-colors hover:bg-gray-50 active:bg-gray-300"
+        class="flex h-12 w-12 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.06] text-base font-medium text-text-primary transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15] active:scale-95"
         @click="onKey(key)"
       >
         {{ key }}
@@ -94,7 +94,7 @@ function onSpace() {
       <!-- Backspace -->
       <button
         v-if="rowIndex === 2"
-        class="flex h-12 w-14 items-center justify-center rounded-lg bg-white text-gray-700 shadow transition-colors hover:bg-gray-50 active:bg-gray-200"
+        class="flex h-12 w-14 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.06] text-text-secondary transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15]"
         @click="onBackspace"
       >
         <svg
@@ -115,11 +115,11 @@ function onSpace() {
     <!-- Bottom row -->
     <div class="flex justify-center gap-1.5">
       <button
-        class="flex h-12 w-20 items-center justify-center rounded-lg text-sm font-medium transition-colors"
+        class="flex h-12 w-20 items-center justify-center rounded-lg text-sm font-medium transition-all duration-150"
         :class="
           isNumberMode
-            ? 'bg-blue-500 text-white shadow-md'
-            : 'bg-white text-gray-700 shadow hover:bg-gray-50 active:bg-gray-200'
+            ? 'bg-accent text-deep shadow-[0_0_12px_var(--color-accent-glow)]'
+            : 'border border-white/[0.08] bg-white/[0.06] text-text-secondary hover:bg-white/[0.1] active:bg-white/[0.15]'
         "
         @click="toggleNumberMode"
       >
@@ -127,14 +127,14 @@ function onSpace() {
       </button>
 
       <button
-        class="flex h-12 flex-1 items-center justify-center rounded-lg bg-white text-sm text-gray-500 shadow transition-colors hover:bg-gray-50 active:bg-gray-300"
+        class="flex h-12 flex-1 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.06] text-sm text-text-muted transition-all duration-150 hover:bg-white/[0.1] active:bg-white/[0.15]"
         @click="onSpace"
       >
         空格
       </button>
 
       <button
-        class="flex h-12 w-20 items-center justify-center rounded-lg bg-blue-500 text-sm font-medium text-white shadow-md transition-colors hover:bg-blue-600 active:bg-blue-700"
+        class="flex h-12 w-20 items-center justify-center rounded-lg bg-danger-dim text-sm font-medium text-danger transition-all duration-150 hover:bg-danger/20 active:bg-danger/25"
         @click="onClear"
       >
         清空

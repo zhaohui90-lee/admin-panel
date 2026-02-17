@@ -1,14 +1,14 @@
-import type { KioskBridge } from './types'
+import type { IBridge } from './types'
 import { createMockBridge } from './mock'
 import { createElectronBridge } from './electron'
 
-let bridge: KioskBridge | null = null
+let bridge: IBridge | null = null
 
-export function getBridge(): KioskBridge {
+export function getBridge(): IBridge {
   if (!bridge) {
-    bridge = window.electronAPI ? createElectronBridge() : createMockBridge()
+    bridge = window.adminAPI ? createElectronBridge() : createMockBridge()
   }
   return bridge
 }
 
-export type { KioskBridge }
+export type { IBridge, LoginResult, SystemInfo, AppConfig } from './types'
