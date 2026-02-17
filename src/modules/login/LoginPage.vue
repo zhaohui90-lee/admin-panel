@@ -9,9 +9,18 @@ const router = useRouter()
 const auth = useAuthStore()
 const bridge = useBridge()
 
+type LoginMode = 'card' | 'password'
+const activeMode = ref<LoginMode>('card')
+
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
+
+function switchMode(mode: LoginMode) {
+  activeMode.value = mode
+  error.value = ''
+  password.value = ''
+}
 
 async function handleLogin() {
   if (!password.value) {
@@ -96,9 +105,49 @@ async function handleLogin() {
 
       <!-- Right Auth Panel -->
       <div class="flex flex-1 flex-col bg-[linear-gradient(180deg,rgba(13,21,38,0.3)_0%,rgba(6,11,24,0.5)_100%)] px-10 py-10">
-        <h3 class="mb-8 text-lg font-semibold text-text-primary">管理员登录</h3>
+        <!-- Tab Bar -->
+        <div class="mb-6 flex border-b border-white/[0.06]">
+          <button
+            class="relative px-5 pb-3 text-sm font-semibold transition-colors duration-200"
+            :class="activeMode === 'card' ? 'text-accent' : 'text-text-muted hover:text-text-secondary'"
+            data-testid="tab-card"
+            @click="switchMode('card')"
+          >
+            工牌感应
+            <span
+              v-if="activeMode === 'card'"
+              class="absolute bottom-0 left-0 h-[2px] w-full rounded-full bg-accent"
+            />
+          </button>
+          <button
+            class="relative px-5 pb-3 text-sm font-semibold transition-colors duration-200"
+            :class="activeMode === 'password' ? 'text-accent' : 'text-text-muted hover:text-text-secondary'"
+            data-testid="tab-password"
+            @click="switchMode('password')"
+          >
+            账号密码
+            <span
+              v-if="activeMode === 'password'"
+              class="absolute bottom-0 left-0 h-[2px] w-full rounded-full bg-accent"
+            />
+          </button>
+        </div>
 
-        <div class="flex flex-1 flex-col justify-center">
+        <!-- IC Card Reader Mode -->
+        <div v-if="activeMode === 'card'" class="flex flex-1 flex-col items-center justify-center text-center" data-testid="mode-card">
+          <div class="rfid-ring relative mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-accent/[0.08]">
+            <svg class="h-10 w-10 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+            <span class="rfid-pulse absolute inset-0 rounded-full border-2 border-accent" />
+          </div>
+          <h3 class="mb-2 text-base font-semibold text-text-primary">请刷员工卡</h3>
+          <p class="text-[13px] text-text-muted">请将工牌靠近感应区，系统将自动登录</p>
+        </div>
+
+        <!-- Password Mode -->
+        <div v-if="activeMode === 'password'" class="flex flex-1 flex-col justify-center" data-testid="mode-password">
           <!-- Password display -->
           <div class="mb-2">
             <label class="mb-2 block text-xs font-medium tracking-wide text-text-secondary">管理密码</label>
@@ -106,7 +155,7 @@ async function handleLogin() {
               class="flex min-h-[52px] items-center rounded-[10px] border px-4 py-3 text-base transition-all duration-200"
               :class="error ? 'border-danger shadow-[0_0_0_3px_var(--color-danger-dim)]' : 'border-white/[0.06] bg-black/30 focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--color-accent-dim)]'"
             >
-              <span v-if="password" class="tracking-[6px] text-text-primary">{{ '●'.repeat(password.length) }}</span>
+              <span v-if="password" class="tracking-[6px] text-text-primary">{{ '\u25CF'.repeat(password.length) }}</span>
               <span v-else class="text-text-muted">请输入管理密码</span>
             </div>
             <p v-if="error" class="mt-2 text-xs text-danger">{{ error }}</p>
@@ -116,6 +165,7 @@ async function handleLogin() {
           <button
             class="mt-4 flex h-[52px] w-full items-center justify-center rounded-[10px] bg-[linear-gradient(135deg,var(--color-accent),#00b884)] text-sm font-semibold tracking-wide text-deep transition-all duration-200 hover:shadow-[0_4px_20px_var(--color-accent-glow)] hover:-translate-y-0.5 active:scale-[0.99] active:translate-y-0 disabled:opacity-50"
             :disabled="loading"
+            data-testid="btn-login"
             @click="handleLogin"
           >
             {{ loading ? '验证中...' : '确认登录' }}
@@ -129,8 +179,8 @@ async function handleLogin() {
       </div>
     </div>
 
-    <!-- Virtual Keyboard -->
-    <div class="fixed bottom-6 left-1/2 z-20 -translate-x-1/2">
+    <!-- Virtual Keyboard (only in password mode) -->
+    <div v-if="activeMode === 'password'" class="fixed bottom-6 left-1/2 z-20 -translate-x-1/2">
       <VirtualKeyboard v-model="password" />
     </div>
   </div>
@@ -140,5 +190,14 @@ async function handleLogin() {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes rfidPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.rfid-pulse {
+  animation: rfidPulse 1.5s ease-out infinite;
 }
 </style>
