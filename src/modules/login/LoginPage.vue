@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useBridge } from '@/composables/useBridge'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
+import StatusBulb from '@/components/StatusBulb.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
 const bridge = useBridge()
 
-type LoginMode = 'card' | 'password'
+type LoginMode = 'card' | 'scan' | 'password'
 const activeMode = ref<LoginMode>('card')
 
 const password = ref('')
@@ -44,127 +45,339 @@ async function handleLogin() {
     loading.value = false
   }
 }
+
+// Bottom nav state machine (follows login-1.html prototype)
+// card  → left=scan,     right=password
+// scan  → left=card(★),  right=password
+// pass  → left=scan,     right=card(★)
+type NavBtn = { mode: LoginMode; label: string; testid: string; active: boolean }
+
+const leftBtn = computed<NavBtn>(() => {
+  if (activeMode.value === 'scan') {
+    return { mode: 'card', label: '返回刷卡', testid: 'tab-card', active: true }
+  }
+  return { mode: 'scan', label: '扫码登录', testid: 'tab-scan', active: false }
+})
+
+const rightBtn = computed<NavBtn>(() => {
+  if (activeMode.value === 'password') {
+    return { mode: 'card', label: '返回刷卡', testid: 'tab-card', active: true }
+  }
+  return { mode: 'password', label: '密码登录', testid: 'tab-password', active: false }
+})
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center overflow-auto bg-deep p-3 sm:p-6">
+  <div class="flex h-screen overflow-hidden bg-black">
 
-    <div class="flex w-full max-w-[960px] animate-[fadeIn_0.8s_ease_both] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.1),0_8px_30px_rgba(0,0,0,0.08)] md:flex-row">
+    <!-- ═══════════════════════════════════════════════
+         LEFT: Status Panel — Kiosk only (lg+)
+         ═══════════════════════════════════════════════ -->
+    <aside
+      class="hidden lg:flex w-[38%] flex-col justify-between px-10 py-16 text-white z-10"
+      style="background: var(--color-panel-dark); box-shadow: 10px 0 30px rgba(0,0,0,0.2);"
+    >
+      <!-- Brand -->
+      <div>
+        <h1 class="text-[2.25rem] font-bold leading-snug tracking-wider">
+          省人民医院<br>设备管理中心
+        </h1>
+        <p class="mt-3 text-base tracking-[3px] opacity-60">Self-Service Kiosk Manager</p>
+      </div>
 
-      <!-- Brand Panel: top on mobile, left on md+ -->
-      <div class="relative flex shrink-0 flex-col justify-between overflow-hidden bg-[linear-gradient(135deg,#1e40af_0%,#2563eb_100%)] p-6 sm:p-8 md:w-[320px] md:p-10 lg:w-[380px]">
-        <!-- Decorative circle -->
-        <div class="pointer-events-none absolute -right-20 -bottom-20 hidden h-75 w-75 rounded-full border border-white/10 md:block" />
+      <!-- Status Monitor -->
+      <div class="flex flex-col items-center gap-4">
+        <StatusBulb status="online" size="lg" label="系统正常" />
+        <p class="text-sm opacity-60">Network Online</p>
+      </div>
 
-        <!-- Brand -->
-        <div>
-          <div class="mb-1 flex items-center gap-3 md:mb-2 md:gap-3.5">
-            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm md:h-11 md:w-11 md:rounded-xl">
-              <svg class="h-5 w-5 text-white md:h-6 md:w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      <!-- Device Metadata -->
+      <div
+        class="border-t pt-5 font-mono text-sm leading-loose"
+        style="border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);"
+      >
+        DEVICE ID: KIOSK-MZ-082<br>
+        IP ADDR: 192.168.10.105<br>
+        VERSION: v2.4.0 (Stable)
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════
+         RIGHT: Interaction Area
+         ═══════════════════════════════════════════════ -->
+    <main class="flex flex-1 flex-col" style="background: var(--color-surface);">
+
+      <!-- Mobile status bar (hidden on lg) -->
+      <div
+        class="flex items-center gap-3 px-6 py-4 text-white lg:hidden"
+        style="background: var(--color-panel-dark);"
+      >
+        <div
+          class="h-2.5 w-2.5 rounded-full animate-pulse"
+          style="background: var(--color-success);"
+        />
+        <span class="font-mono text-sm" style="opacity: 0.8;">KIOSK-MZ-082 · 系统正常</span>
+      </div>
+
+      <!-- View Area (flex-1 centered) -->
+      <div class="flex flex-1 flex-col items-center justify-center px-8 py-6">
+        <Transition name="view-fade" mode="out-in">
+
+          <!-- Card mode -->
+          <div
+            v-if="activeMode === 'card'"
+            key="card"
+            class="flex flex-col items-center text-center"
+            data-testid="mode-card"
+          >
+            <div class="hero-icon animate-pulse-soft mb-8 lg:mb-10">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2" />
+                <line x1="7" y1="15" x2="7.01" y2="15" stroke-width="3" />
+                <path d="M11 15h4" />
               </svg>
             </div>
-            <h2 class="text-lg font-bold tracking-wide text-white md:text-[22px]">智慧医疗控制中心</h2>
+            <h2 class="mb-4 text-4xl font-extrabold lg:text-5xl" style="color: var(--color-text-primary);">
+              请刷员工卡
+            </h2>
+            <p class="text-lg lg:text-2xl" style="color: var(--color-text-secondary);">
+              将工牌靠近屏幕下方感应区
+            </p>
           </div>
-          <p class="ml-12 font-mono text-[10px] tracking-[3px] text-blue-200 uppercase md:ml-14.5 md:text-[11px]">Kiosk Admin Panel</p>
-        </div>
 
-        <!-- Terminal badge -->
-        <div class="relative z-10 mt-4 flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 font-mono text-[10.5px] text-blue-100 backdrop-blur-sm md:mt-0 md:gap-2.5 md:rounded-[10px] md:px-4 md:py-3 md:text-[11.5px]">
-          <span class="relative h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)] md:h-1.75 md:w-1.75">
-            <span class="absolute -inset-0.75 animate-ping rounded-full border border-emerald-400" />
-          </span>
-          <span>终端 SZ-SH-082&nbsp;|&nbsp;系统在线</span>
-        </div>
-      </div>
-
-      <!-- Auth Panel -->
-      <div class="flex flex-1 flex-col p-6 sm:p-8 md:px-10 md:py-10">
-        <!-- Tab Bar -->
-        <div class="mb-5 flex border-b border-border md:mb-6">
-          <button
-            class="relative px-4 pb-2.5 text-sm font-semibold transition-colors duration-200 md:px-5 md:pb-3"
-            :class="activeMode === 'card' ? 'text-accent' : 'text-text-muted hover:text-text-secondary'"
-            data-testid="tab-card"
-            @click="switchMode('card')"
+          <!-- Scan mode -->
+          <div
+            v-else-if="activeMode === 'scan'"
+            key="scan"
+            class="flex flex-col items-center text-center"
+            data-testid="mode-scan"
           >
-            工牌感应
-            <span v-if="activeMode === 'card'" class="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-accent" />
-          </button>
-          <button
-            class="relative px-4 pb-2.5 text-sm font-semibold transition-colors duration-200 md:px-5 md:pb-3"
-            :class="activeMode === 'password' ? 'text-accent' : 'text-text-muted hover:text-text-secondary'"
-            data-testid="tab-password"
-            @click="switchMode('password')"
-          >
-            账号密码
-            <span v-if="activeMode === 'password'" class="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-accent" />
-          </button>
-        </div>
-
-        <!-- IC Card Reader Mode -->
-        <div v-if="activeMode === 'card'" class="flex flex-1 flex-col items-center justify-center py-8 text-center md:py-0" data-testid="mode-card">
-          <div class="rfid-ring relative mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent-dim md:mb-6 md:h-20 md:w-20">
-            <svg class="h-8 w-8 text-accent md:h-10 md:w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <rect x="2" y="5" width="20" height="14" rx="2" />
-              <line x1="2" y1="10" x2="22" y2="10" />
-            </svg>
-            <span class="rfid-pulse absolute inset-0 rounded-full border-2 border-accent/40" />
-          </div>
-          <h3 class="mb-2 text-base font-semibold text-text-primary">请刷员工卡</h3>
-          <p class="text-[13px] text-text-muted">请将工牌靠近感应区，系统将自动登录</p>
-        </div>
-
-        <!-- Password Mode -->
-        <div v-if="activeMode === 'password'" class="flex flex-1 flex-col justify-center" data-testid="mode-password">
-          <div class="mb-2">
-            <label class="mb-2 block text-xs font-medium tracking-wide text-text-secondary">管理密码</label>
-            <div
-              class="flex min-h-12 items-center rounded-[10px] border px-4 py-3 text-base transition-all duration-200 md:min-h-13"
-              :class="error ? 'border-danger shadow-[0_0_0_3px_var(--color-danger-dim)]' : 'border-border bg-surface focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--color-accent-dim)]'"
-            >
-              <span v-if="password" class="tracking-[6px] text-text-primary">{{ '\u25CF'.repeat(password.length) }}</span>
-              <span v-else class="text-text-muted">请输入管理密码</span>
+            <div class="hero-icon hero-icon--square mb-8 lg:mb-10">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
             </div>
-            <p v-if="error" class="mt-2 text-xs text-danger">{{ error }}</p>
+            <h2 class="mb-4 text-4xl font-extrabold lg:text-5xl" style="color: var(--color-text-primary);">
+              扫码登录
+            </h2>
+            <p class="text-lg lg:text-2xl" style="color: var(--color-text-secondary);">
+              请使用企业微信 / 钉钉扫码
+            </p>
           </div>
 
-          <button
-            class="mt-4 flex h-12 w-full items-center justify-center rounded-[10px] bg-accent text-sm font-semibold tracking-wide text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-[0_4px_20px_var(--color-accent-glow)] hover:-translate-y-0.5 active:scale-[0.99] active:translate-y-0 disabled:opacity-50 md:h-13"
-            :disabled="loading"
-            data-testid="btn-login"
-            @click="handleLogin"
+          <!-- Password mode -->
+          <div
+            v-else
+            key="password"
+            class="w-full max-w-md"
+            data-testid="mode-password"
           >
-            {{ loading ? '验证中...' : '确认登录' }}
-          </button>
-        </div>
+            <h2 class="mb-8 text-3xl font-extrabold lg:text-4xl" style="color: var(--color-text-primary);">
+              密码登录
+            </h2>
 
-        <!-- Footer -->
-        <div class="mt-auto pt-3 text-center font-mono text-[10px] tracking-wide text-text-muted md:pt-4 md:text-[10.5px]">
-          &copy; 2026 智慧医疗信息技术有限公司 · V2.4.0
-        </div>
+            <!-- Password display -->
+            <div
+              class="password-display mb-4"
+              :class="{ 'password-display--error': error }"
+            >
+              <span
+                v-if="password"
+                class="font-bold tracking-[8px] text-2xl lg:text-3xl"
+                style="color: var(--color-text-primary);"
+              >
+                {{ '●'.repeat(password.length) }}
+              </span>
+              <span v-else class="text-xl lg:text-2xl" style="color: var(--color-text-muted);">
+                请输入管理密码
+              </span>
+            </div>
+
+            <p v-if="error" class="mb-5 text-base font-medium" style="color: var(--color-danger);">
+              {{ error }}
+            </p>
+
+            <button
+              class="login-confirm-btn"
+              :disabled="loading"
+              data-testid="btn-login"
+              @click="handleLogin"
+            >
+              {{ loading ? '验证中...' : '确认登录' }}
+            </button>
+
+            <p class="mt-6 text-center text-sm lg:text-base" style="color: var(--color-text-muted);">
+              如忘记密码，请刷卡或联系信息科
+            </p>
+          </div>
+
+        </Transition>
       </div>
-    </div>
 
-    <!-- Virtual Keyboard (only in password mode) -->
-    <div v-if="activeMode === 'password'" class="fixed bottom-3 left-1/2 z-20 w-full max-w-2xl -translate-x-1/2 px-3 sm:bottom-6 sm:px-0">
+      <!-- Bottom Navigation -->
+      <div class="grid grid-cols-2 gap-5 px-8 pb-8 lg:gap-8 lg:px-16 lg:pb-12">
+        <button
+          class="nav-btn"
+          :class="{ 'nav-btn--active': leftBtn.active }"
+          :data-testid="leftBtn.testid"
+          @click="switchMode(leftBtn.mode)"
+        >
+          {{ leftBtn.label }}
+        </button>
+        <button
+          class="nav-btn"
+          :class="{ 'nav-btn--active': rightBtn.active }"
+          :data-testid="rightBtn.testid"
+          @click="switchMode(rightBtn.mode)"
+        >
+          {{ rightBtn.label }}
+        </button>
+      </div>
+
+    </main>
+
+    <!-- Virtual keyboard (password mode only) -->
+    <div
+      v-if="activeMode === 'password'"
+      class="fixed bottom-0 left-0 right-0 z-20 px-3 pb-3 sm:px-6 sm:pb-4 lg:left-[38%]"
+    >
       <VirtualKeyboard v-model="password" />
     </div>
+
   </div>
 </template>
 
 <style scoped>
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+/* Hero icon circle */
+.hero-icon {
+  width: 160px;
+  height: 160px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
 }
 
-@keyframes rfidPulse {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.6); opacity: 0; }
+@media (min-width: 1024px) {
+  .hero-icon {
+    width: 220px;
+    height: 220px;
+  }
 }
 
-.rfid-pulse {
-  animation: rfidPulse 1.5s ease-out infinite;
+.hero-icon svg {
+  width: 42%;
+  height: 42%;
+}
+
+.hero-icon--square {
+  border-radius: var(--touch-radius-lg);
+}
+
+/* Password display */
+.password-display {
+  width: 100%;
+  height: var(--touch-input-height);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  background: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--touch-radius-md);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.password-display--error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 6px var(--color-danger-dim);
+}
+
+/* Login button */
+.login-confirm-btn {
+  width: 100%;
+  height: var(--touch-btn-height);
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--touch-radius-md);
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+@media (min-width: 1024px) {
+  .login-confirm-btn {
+    font-size: 1.5rem;
+  }
+}
+
+.login-confirm-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Bottom nav buttons */
+.nav-btn {
+  height: var(--touch-btn-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 2px solid var(--color-border);
+  background: white;
+  border-radius: var(--touch-radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 4px 0 var(--color-border);
+}
+
+@media (min-width: 1024px) {
+  .nav-btn {
+    font-size: 1.375rem;
+  }
+}
+
+.nav-btn:active:not(.nav-btn--active) {
+  transform: translateY(4px);
+  box-shadow: none;
+  background: var(--color-deep);
+}
+
+.nav-btn--active {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 0 var(--color-accent-dark);
+}
+
+.nav-btn--active:active {
+  transform: translateY(4px);
+  box-shadow: none;
+  background: var(--color-accent-dark);
+}
+
+/* View transition */
+.view-fade-enter-active {
+  animation: fade-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-fade-leave-active {
+  opacity: 0;
+  transition: opacity 0.15s ease;
 }
 </style>
