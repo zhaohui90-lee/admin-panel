@@ -16,11 +16,21 @@ const activeMode = ref<LoginMode>('card')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
+const showKeyboard = ref(false)
 
 function switchMode(mode: LoginMode) {
   activeMode.value = mode
   error.value = ''
   password.value = ''
+  showKeyboard.value = mode === 'password'
+}
+
+function onPasswordAreaClick() {
+  showKeyboard.value = true
+}
+
+function onBackgroundClick() {
+  showKeyboard.value = false
 }
 
 async function handleLogin() {
@@ -119,8 +129,8 @@ const rightBtn = computed<NavBtn>(() => {
         <span class="font-mono text-sm" style="opacity: 0.8;">KIOSK-MZ-082 · 系统正常</span>
       </div>
 
-      <!-- View Area (flex-1 centered) -->
-      <div class="flex flex-1 flex-col items-center justify-center px-8 py-6">
+      <!-- View Area (flex-1 centered) — click background to dismiss keyboard -->
+      <div class="flex flex-1 flex-col items-center justify-center px-8 py-6" @click="onBackgroundClick">
         <Transition name="view-fade" mode="out-in">
 
           <!-- Card mode -->
@@ -179,10 +189,11 @@ const rightBtn = computed<NavBtn>(() => {
               密码登录
             </h2>
 
-            <!-- Password display -->
+            <!-- Password display — click to show keyboard -->
             <div
               class="password-display mb-4"
               :class="{ 'password-display--error': error }"
+              @click.stop="onPasswordAreaClick"
             >
               <span
                 v-if="password"
@@ -239,10 +250,11 @@ const rightBtn = computed<NavBtn>(() => {
 
     </main>
 
-    <!-- Virtual keyboard (password mode only) -->
+    <!-- Virtual keyboard (password mode + keyboard visible) -->
     <div
-      v-if="activeMode === 'password'"
+      v-if="activeMode === 'password' && showKeyboard"
       class="fixed bottom-0 left-0 right-0 z-20 px-3 pb-3 sm:px-6 sm:pb-4 lg:left-[38%]"
+      @click.stop
     >
       <VirtualKeyboard v-model="password" />
     </div>

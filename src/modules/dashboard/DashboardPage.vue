@@ -92,6 +92,7 @@ function onShutdownOS()  { openConfirm('关闭自助机',   '确认关闭自助�
 </script>
 
 <template>
+  <div>
   <div class="mx-auto max-w-5xl space-y-5 lg:space-y-6">
 
     <!-- ── Page Header ───────────────────────────────── -->
@@ -364,4 +365,5 @@ function onShutdownOS()  { openConfirm('关闭自助机',   '确认关闭自助�
     @confirm="handleConfirm"
     @cancel="handleCancel"
   />
+  </div>
 </template>

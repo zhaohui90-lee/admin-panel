@@ -277,4 +277,48 @@ describe('Navigation', () => {
       }
     })
   })
+
+  describe('Page rendering after navigation', () => {
+    it('renders stub page content after navigating from dashboard to logs', async () => {
+      const router = createTestRouter()
+      addGuard(router)
+      const auth = useAuthStore()
+      auth.login('test-token')
+
+      router.push('/dashboard')
+      await router.isReady()
+
+      const wrapper = mount(AppLayout, {
+        global: { plugins: [pinia, router] },
+      })
+
+      expect(wrapper.find('[data-testid="stub-page"]').exists()).toBe(true)
+
+      await router.push('/logs')
+      await wrapper.vm.$nextTick()
+
+      expect(router.currentRoute.value.name).toBe('logs')
+      expect(wrapper.find('[data-testid="stub-page"]').exists()).toBe(true)
+    })
+
+    it('renders stub page content after navigating through multiple routes', async () => {
+      const router = createTestRouter()
+      addGuard(router)
+      const auth = useAuthStore()
+      auth.login('test-token')
+
+      router.push('/dashboard')
+      await router.isReady()
+
+      const wrapper = mount(AppLayout, {
+        global: { plugins: [pinia, router] },
+      })
+
+      for (const route of ['/logs', '/settings', '/reports', '/dashboard'] as const) {
+        await router.push(route)
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('[data-testid="stub-page"]').exists()).toBe(true)
+      }
+    })
+  })
 })

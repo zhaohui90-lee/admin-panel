@@ -152,4 +152,72 @@ describe('LoginPage', () => {
       expect(vm.error).toBe('')
     })
   })
+
+  describe('Virtual keyboard visibility', () => {
+    it('shows keyboard when entering password mode', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="tab-password"]').trigger('click')
+
+      const vm = wrapper.vm as unknown as { showKeyboard: boolean }
+      expect(vm.showKeyboard).toBe(true)
+      expect(wrapper.findComponent({ name: 'VirtualKeyboard' }).exists()).toBe(true)
+    })
+
+    it('hides keyboard when clicking background area', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="tab-password"]').trigger('click')
+
+      const vm = wrapper.vm as unknown as { showKeyboard: boolean }
+      expect(vm.showKeyboard).toBe(true)
+
+      // Click background area to dismiss keyboard
+      const viewArea = wrapper.find('.flex.flex-1.flex-col.items-center')
+      await viewArea.trigger('click')
+
+      expect(vm.showKeyboard).toBe(false)
+    })
+
+    it('shows keyboard when clicking password display', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="tab-password"]').trigger('click')
+
+      const vm = wrapper.vm as unknown as { showKeyboard: boolean }
+
+      // First dismiss the keyboard
+      vm.showKeyboard = false
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent({ name: 'VirtualKeyboard' }).exists()).toBe(false)
+
+      // Click password display to show keyboard again
+      const passwordDisplay = wrapper.find('.password-display')
+      await passwordDisplay.trigger('click')
+
+      expect(vm.showKeyboard).toBe(true)
+    })
+
+    it('hides keyboard when switching away from password mode', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="tab-password"]').trigger('click')
+
+      const vm = wrapper.vm as unknown as { showKeyboard: boolean }
+      expect(vm.showKeyboard).toBe(true)
+
+      // Switch to card mode
+      await wrapper.find('[data-testid="tab-card"]').trigger('click')
+      expect(vm.showKeyboard).toBe(false)
+    })
+
+    it('does not show keyboard in card or scan mode', async () => {
+      const wrapper = mountPage()
+      const vm = wrapper.vm as unknown as { showKeyboard: boolean }
+
+      // Card mode - no keyboard
+      expect(vm.showKeyboard).toBe(false)
+      expect(wrapper.findComponent({ name: 'VirtualKeyboard' }).exists()).toBe(false)
+
+      // Scan mode - no keyboard
+      await wrapper.find('[data-testid="tab-scan"]').trigger('click')
+      expect(vm.showKeyboard).toBe(false)
+    })
+  })
 })
