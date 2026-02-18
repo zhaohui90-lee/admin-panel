@@ -133,6 +133,92 @@ describe('Navigation', () => {
     })
   })
 
+  describe('Mobile bottom tab bar', () => {
+    it('renders all 5 nav items in bottom tab bar', async () => {
+      const router = createTestRouter()
+      addGuard(router)
+      const auth = useAuthStore()
+      auth.login('test-token')
+
+      router.push('/dashboard')
+      await router.isReady()
+
+      const wrapper = mount(AppLayout, {
+        global: { plugins: [pinia, router] },
+      })
+
+      const bottomBar = wrapper.find('[data-testid="bottom-tab-bar"]')
+      expect(bottomBar.exists()).toBe(true)
+
+      const tabs = bottomBar.findAll('button')
+      const labels = tabs.map((t) => t.text())
+      expect(labels).toContain('运行状态')
+      expect(labels).toContain('交易日志')
+      expect(labels).toContain('系统设置')
+      expect(labels).toContain('硬件调试')
+      expect(labels).toContain('故障申报')
+    })
+
+    it('active bottom tab has text-accent class', async () => {
+      const router = createTestRouter()
+      addGuard(router)
+      const auth = useAuthStore()
+      auth.login('test-token')
+
+      router.push('/dashboard')
+      await router.isReady()
+
+      const wrapper = mount(AppLayout, {
+        global: { plugins: [pinia, router] },
+      })
+
+      const activeTab = wrapper.find('[data-testid="bottom-tab-dashboard"]')
+      expect(activeTab.classes()).toContain('text-accent')
+    })
+
+    it('inactive bottom tabs have text-sidebar-text class', async () => {
+      const router = createTestRouter()
+      addGuard(router)
+      const auth = useAuthStore()
+      auth.login('test-token')
+
+      router.push('/dashboard')
+      await router.isReady()
+
+      const wrapper = mount(AppLayout, {
+        global: { plugins: [pinia, router] },
+      })
+
+      const logsTab = wrapper.find('[data-testid="bottom-tab-logs"]')
+      expect(logsTab.classes()).toContain('text-sidebar-text')
+      expect(logsTab.classes()).not.toContain('text-accent')
+    })
+
+    it('active bottom tab updates on route change', async () => {
+      const router = createTestRouter()
+      addGuard(router)
+      const auth = useAuthStore()
+      auth.login('test-token')
+
+      router.push('/dashboard')
+      await router.isReady()
+
+      const wrapper = mount(AppLayout, {
+        global: { plugins: [pinia, router] },
+      })
+
+      // Switch to logs route
+      await router.push('/logs')
+      await wrapper.vm.$nextTick()
+
+      const logsTab = wrapper.find('[data-testid="bottom-tab-logs"]')
+      expect(logsTab.classes()).toContain('text-accent')
+
+      const dashboardTab = wrapper.find('[data-testid="bottom-tab-dashboard"]')
+      expect(dashboardTab.classes()).not.toContain('text-accent')
+    })
+  })
+
   describe('Route guard', () => {
     it('redirects to /login when not authenticated', async () => {
       const router = createTestRouter()
