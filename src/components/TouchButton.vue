@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  variant?: 'primary' | 'danger' | 'outline'
+  variant?: 'primary' | 'danger' | 'warning' | 'outline'
   loading?: boolean
   disabled?: boolean
 }>()
@@ -113,6 +113,20 @@ defineEmits<{
   transform: translateY(4px);
   box-shadow: none;
   background: #dc2626;
+}
+
+/* Variant: warning */
+.touch-btn--warning {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fde68a;
+  box-shadow: 0 4px 0 #fcd34d;
+}
+
+.touch-btn--warning:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: none;
+  background: #fef3c7;
 }
 
 /* Disabled */

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import TouchButton from './TouchButton.vue'
+
 defineProps<{
   visible: boolean
   title: string
@@ -18,27 +20,27 @@ const emit = defineEmits<{
     <Transition name="fade">
       <div
         v-if="visible"
-        class="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center"
+        class="fixed inset-0 z-50 flex items-center justify-center p-6 backdrop-blur-sm"
+        style="background: rgba(0,0,0,0.65);"
         @click.self="emit('cancel')"
       >
-        <div class="w-full max-w-sm rounded-xl border border-border bg-card p-5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] sm:rounded-2xl sm:p-6">
-          <h3 class="mb-1.5 text-base font-semibold text-text-primary sm:mb-2 sm:text-lg">{{ title }}</h3>
-          <p class="mb-5 text-sm text-text-secondary sm:mb-6">{{ message }}</p>
-          <div class="flex gap-2 sm:gap-3">
-            <button
-              class="flex-1 rounded-lg border border-border bg-surface py-2.5 text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-gray-100 sm:rounded-[10px] sm:py-3"
-              :disabled="loading"
-              @click="emit('cancel')"
-            >
+        <div
+          class="w-full max-w-md rounded-2xl border p-6 shadow-2xl lg:p-8"
+          style="background: var(--color-card); border-color: var(--color-border);"
+        >
+          <h3 class="mb-3 text-xl font-bold lg:text-2xl" style="color: var(--color-text-primary);">
+            {{ title }}
+          </h3>
+          <p class="mb-6 text-base lg:mb-8 lg:text-lg" style="color: var(--color-text-secondary);">
+            {{ message }}
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            <TouchButton :disabled="loading" @click="emit('cancel')">
               取消
-            </button>
-            <button
-              class="flex-1 rounded-lg bg-danger py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-600 disabled:opacity-50 sm:rounded-[10px] sm:py-3"
-              :disabled="loading"
-              @click="emit('confirm')"
-            >
-              {{ loading ? '执行中...' : (confirmText ?? '确认') }}
-            </button>
+            </TouchButton>
+            <TouchButton variant="danger" :loading="loading" @click="emit('confirm')">
+              {{ confirmText ?? '确认' }}
+            </TouchButton>
           </div>
         </div>
       </div>
