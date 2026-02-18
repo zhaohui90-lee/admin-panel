@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>医院自助设备管理端 - 触控版</title>
+    <style>
+        /* --- 1. 工业级设计系统变量 --- */
+        :root {
+            /* 医疗蓝：冷静、专业 */
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            
+            /* 状态色 */
+            --bg-dark: #0f172a;       /* 深蓝灰背景 */
+            --bg-light: #f8fafc;      /* 浅灰白背景 */
+            --status-green: #22c55e;  /* 在线绿色 */
+            --text-white: #ffffff;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+
+            /* 触控尺寸规范 */
+            --btn-height: 90px;       /* 底部大按钮高度 */
+            --input-height: 70px;     /* 输入框高度 */
+            --radius-lg: 24px;        /* 卡片圆角 */
+            --radius-md: 16px;        /* 按钮圆角 */
+        }
+
+        /* --- 2. 基础重置 --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-drag: none; }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+            background: #000;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- 3. 左侧：状态看板 (40%) --- */
+        .side-panel {
+            flex: 0 0 38%;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .brand-area h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        .brand-area p { opacity: 0.6; font-size: 18px; letter-spacing: 1px; }
+
+        /* 巨大的状态指示灯 */
+        .status-monitor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .status-bulb {
+            width: 140px;
+            height: 140px;
+            background: var(--status-green);
+            border-radius: 50%;
+            margin-bottom: 40px;
+            box-shadow: 0 0 0 20px rgba(34, 197, 94, 0.15);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 呼吸动画 */
+        .status-bulb::after {
+            content: "";
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--status-green);
+            animation: ripple 2s infinite;
+        }
+        .status-icon { width: 60px; height: 60px; fill: white; }
+        .status-text { font-size: 32px; font-weight: bold; color: var(--status-green); }
+
+        .device-meta {
+            text-align: center;
+            font-family: monospace;
+            opacity: 0.4;
+            font-size: 14px;
+            line-height: 1.6;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+        }
+
+        /* --- 4. 右侧：交互区 (60%) --- */
+        .main-panel {
+            flex: 1;
+            background: var(--bg-light);
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 视图容器 */
+        .view-container {
+            flex: 1;
+            display: none; /* JS控制切换 */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .view-container.active { display: flex; }
+
+        /* 图标与提示文字 */
+        .hero-icon {
+            width: 220px;
+            height: 220px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
+            color: var(--primary-blue);
+        }
+        .hero-icon svg { width: 100px; height: 100px; stroke-width: 1.5; }
+        
+        .hero-title { font-size: 48px; font-weight: 800; color: var(--text-dark); margin-bottom: 15px; }
+        .hero-subtitle { font-size: 24px; color: var(--text-gray); }
+
+        /* --- 5. 底部切换栏 (关键触控区) --- */
+        .bottom-nav {
+            margin-top: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .nav-btn {
+            height: var(--btn-height);
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: var(--radius-md);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #e2e8f0; /* 实体感投影 */
+        }
+        .nav-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+            background: #f1f5f9;
+        }
+        .nav-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+        .nav-btn svg { width: 32px; height: 32px; }
+
+        /* --- 6. 密码登录模式样式 --- */
+        .form-container { width: 100%; max-width: 500px; }
+        .input-group { margin-bottom: 30px; position: relative; }
+        .big-input {
+            width: 100%;
+            height: var(--input-height);
+            font-size: 28px;
+            padding: 0 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: 0.3s;
+            background: white;
+            color: var(--text-dark);
+        }
+        .big-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
+        }
+        .clear-btn {
+            position: absolute;
+            right: 20px; top: 50%;
+            transform: translateY(-50%);
+            width: 40px; height: 40px;
+            background: #eee;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #666;
+            cursor: pointer;
+        }
+        .login-btn {
+            width: 100%;
+            height: var(--btn-height);
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+        }
+        .login-btn:active { transform: scale(0.98); }
+
+        /* --- 7. 动画定义 --- */
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse-icon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse { animation: pulse-icon 2s infinite ease-in-out; }
+
+    </style>
+</head>
+<body>
+
+    <aside class="side-panel">
+        <div class="brand-area">
+            <h1>省人民医院<br>设备管理中心</h1>
+            <p>Self-Service Kiosk Manager</p>
+        </div>
+
+        <div class="status-monitor">
+            <div class="status-bulb">
+                <svg class="status-icon" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+            </div>
+            <div class="status-text">系统正常</div>
+            <div style="margin-top:10px; opacity:0.6; color:white">Network Online</div>
+        </div>
+
+        <div class="device-meta">
+            DEVICE ID: KIOSK-MZ-082<br>
+            IP ADDR: 192.168.10.105<br>
+            VERSION: v2.4.0 (Stable)
+        </div>
+    </aside>
+
+    <main class="main-panel">
+        
+        <div id="view-card" class="view-container active">
+            <div class="hero-icon animate-pulse">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    <rect x="3" y="5" width="18" height="14" rx="2" stroke-width="2"></rect>
+                    <line x1="7" y1="15" x2="7.01" y2="15" stroke-width="3"></line>
+                    <path d="M11 15h4"></path>
+                </svg>
+            </div>
+            <div class="hero-title">请刷员工卡</div>
+            <div class="hero-subtitle">将工牌靠近屏幕下方感应区</div>
+        </div>
+
+        <div id="view-scan" class="view-container">
+            <div class="hero-icon" style="border-radius: 24px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+            </div>
+            <div class="hero-title">扫码登录</div>
+            <div class="hero-subtitle">请使用企业微信/钉钉扫码</div>
+        </div>
+
+        <div id="view-password" class="view-container">
+            <h2 class="hero-title" style="margin-bottom: 40px;">密码登录</h2>
+            <div class="form-container">
+                <div class="input-group">
+                    <input type="text" class="big-input" placeholder="请输入工号">
+                </div>
+                <div class="input-group">
+                    <input type="password" class="big-input" placeholder="请输入密码">
+                </div>
+                <button class="login-btn" onclick="alert('登录逻辑触发')">登 录</button>
+            </div>
+            <div style="margin-top: 20px; color: #999; font-size: 18px;">如忘记密码，请刷卡或联系信息科</div>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-btn" id="btn-left" onclick="handleNav('left')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                扫码登录
+            </button>
+            <button class="nav-btn" id="btn-right" onclick="handleNav('right')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                密码登录
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        // Simple State Machine
+        let currentState = 'card'; // card | scan | password
+
+        function updateUI() {
+            // 1. Hide all views
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            // 2. Show current view
+            document.getElementById(`view-${currentState}`).classList.add('active');
+
+            // 3. Update Buttons
+            const btnLeft = document.getElementById('btn-left');
+            const btnRight = document.getElementById('btn-right');
+
+            // Reset styles
+            btnLeft.className = 'nav-btn';
+            btnRight.className = 'nav-btn';
+
+            if (currentState === 'card') {
+                // Left: Scan, Right: Pass
+                btnLeft.innerHTML = iconScan + ' 扫码登录';
+                btnRight.innerHTML = iconPass + ' 密码登录';
+                btnLeft.onclick = () => setState('scan');
+                btnRight.onclick = () => setState('password');
+            } else if (currentState === 'scan') {
+                // Left: Card (Active), Right: Pass
+                btnLeft.className = 'nav-btn active';
+                btnLeft.innerHTML = iconCard + ' 返回刷卡';
+                btnRight.innerHTML = iconPass + ' 密码登录';
+                btnLeft.onclick = () => setState('card');
+                btnRight.onclick = () => setState('password');
+            } else if (currentState === 'password') {
+                // Left: Scan, Right: Card (Active/Back)
+                btnLeft.innerHTML = iconScan + ' 扫码登录';
+                btnRight.className = 'nav-btn active';
+                btnRight.innerHTML = iconCard + ' 返回刷卡';
+                btnLeft.onclick = () => setState('scan');
+                btnRight.onclick = () => setState('card');
+            }
+        }
+
+        function setState(newState) {
+            currentState = newState;
+            updateUI();
+        }
+
+        function handleNav(direction) {
+            // Handled dynamically in updateUI
+        }
+
+        // SVG Icons strings for JS injection
+        const iconScan = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>';
+        const iconPass = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+        const iconCard = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" stroke-width="2"></rect><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+
+        // Init
+        updateUI();
+
+        // 模拟刷卡动作 (点击图标)
+        document.querySelector('.status-monitor').addEventListener('click', () => {
+             // 模拟：点击绿色状态灯触发“系统自检”弹窗
+             alert('系统自检：\n打印机：缺纸\n读卡器：正常\n网络：延迟 5ms');
+        });
+    </script>
+</body>
+</html>
