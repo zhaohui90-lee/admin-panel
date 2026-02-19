@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import { useBridge } from '@/composables/useBridge'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
+import { useKeyboardScroll } from '@/composables/useKeyboardScroll'
 import { BridgeError } from '@/bridge'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import type { HardwareDeviceInfo, HardwareTestResult } from '@/bridge'
@@ -77,6 +78,9 @@ interface LogEntry {
 
 const commandInput = ref('')
 const showKeyboard = ref(false)
+const commandSectionRef = ref<HTMLElement | null>(null)
+
+useKeyboardScroll(commandSectionRef, showKeyboard)
 const sendingCommand = ref(false)
 const terminalLogs = ref<LogEntry[]>([])
 
@@ -291,7 +295,7 @@ function toggleKeyboard() {
       </div>
 
       <!-- Command input -->
-      <div class="flex gap-2">
+      <div ref="commandSectionRef" class="flex gap-2">
         <div
           class="flex min-h-10 flex-1 items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm transition-all focus-within:border-accent focus-within:shadow-[0_0_0_3px_var(--color-accent-dim)] sm:min-h-11 sm:px-4"
           @click="showKeyboard = true"

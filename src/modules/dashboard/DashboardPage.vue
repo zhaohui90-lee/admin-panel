@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useDeviceStore } from '@/stores/device'
 import { useToast } from '@/composables/useToast'
+import { useKeyboardScroll } from '@/composables/useKeyboardScroll'
 import { BridgeError } from '@/bridge'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
@@ -64,6 +65,9 @@ const serverUrlInput = ref('')
 const serverUrlEditing = ref(false)
 const serverUrlSaving = ref(false)
 const showKeyboard = ref(false)
+const urlSectionRef = ref<HTMLElement | null>(null)
+
+useKeyboardScroll(urlSectionRef, showKeyboard)
 
 function startEditUrl() {
   serverUrlInput.value = device.config?.serverUrl ?? ''
@@ -417,6 +421,7 @@ function onShutdownOS() {
 
       <!-- ── Server URL Config ─────────────────────────── -->
       <section
+        ref="urlSectionRef"
         class="rounded-2xl border shadow-sm"
         style="background: var(--color-card); border-color: var(--color-border)"
       >
@@ -480,7 +485,7 @@ function onShutdownOS() {
 
       <!-- Virtual Keyboard -->
       <div v-if="showKeyboard" class="flex justify-center pb-4">
-        <VirtualKeyboard v-model="serverUrlInput" />
+        <VirtualKeyboard v-model="serverUrlInput" input-type="ip" />
       </div>
     </div>
 

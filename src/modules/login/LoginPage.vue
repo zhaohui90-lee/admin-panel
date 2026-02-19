@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useBridge } from '@/composables/useBridge'
+import { useKeyboardScroll } from '@/composables/useKeyboardScroll'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import StatusBulb from '@/components/StatusBulb.vue'
 
@@ -17,6 +18,9 @@ const password = ref('')
 const error = ref('')
 const loading = ref(false)
 const showKeyboard = ref(false)
+const passwordAreaRef = ref<HTMLElement | null>(null)
+
+useKeyboardScroll(passwordAreaRef, showKeyboard)
 
 function switchMode(mode: LoginMode) {
   activeMode.value = mode
@@ -191,6 +195,7 @@ const rightBtn = computed<NavBtn>(() => {
 
             <!-- Password display — click to show keyboard -->
             <div
+              ref="passwordAreaRef"
               class="password-display mb-4"
               :class="{ 'password-display--error': error }"
               @click.stop="onPasswordAreaClick"
