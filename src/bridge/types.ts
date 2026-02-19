@@ -83,6 +83,28 @@ export interface LogPage {
   pageSize: number
 }
 
+/** 错误代码常量 */
+export const ErrorCodes = {
+  AUTH_FAILED: 'E01',
+  DEVICE_BLOCKED: 'E02',
+  NET_TIMEOUT: 'E03',
+  BRIDGE_UNAVAILABLE: 'E04',
+  COMMAND_FAILED: 'E05',
+  CONFIG_INVALID: 'E06',
+} as const
+
+/** Bridge 统一错误类 — 携带可追溯的错误代码 */
+export class BridgeError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public detail?: string,
+  ) {
+    super(message)
+    this.name = 'BridgeError'
+  }
+}
+
 /** 前端唯一使用的 Bridge 接口 */
 export interface IBridge {
   auth: {

@@ -5,33 +5,37 @@ import { useAuthStore } from '../stores/auth'
 import DashboardPage from '../modules/dashboard/DashboardPage.vue'
 
 // Mock the bridge so device store doesn't make real calls
-vi.mock('../bridge', () => ({
-  getBridge: () => ({
-    system: {
-      getSystemInfo: vi.fn().mockResolvedValue({
-        cpu: { model: 'Test CPU', usage: 42 },
-        memory: { total: 8 * 1024 ** 3, used: 2 * 1024 ** 3 },
-        disk: { total: 256 * 1024 ** 3, used: 100 * 1024 ** 3 },
-        network: { ip: '10.0.0.1', latency: 18 },
-        os: { platform: 'linux', version: 'Ubuntu 22.04', uptime: 86400 },
-      }),
-      getConfig: vi.fn().mockResolvedValue({
-        serverUrl: 'http://hospital-server:8080',
-        deviceId: 'KIOSK-MZ-082',
-        version: '2.4.0',
-      }),
-    },
-    power: {
-      restartApp:  vi.fn().mockResolvedValue(undefined),
-      quitApp:     vi.fn().mockResolvedValue(undefined),
-      rebootOS:    vi.fn().mockResolvedValue(undefined),
-      shutdownOS:  vi.fn().mockResolvedValue(undefined),
-    },
-    business: {
-      reloadPage: vi.fn().mockResolvedValue(undefined),
-    },
-  }),
-}))
+vi.mock('../bridge', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../bridge')>()
+  return {
+    ...actual,
+    getBridge: () => ({
+      system: {
+        getSystemInfo: vi.fn().mockResolvedValue({
+          cpu: { model: 'Test CPU', usage: 42 },
+          memory: { total: 8 * 1024 ** 3, used: 2 * 1024 ** 3 },
+          disk: { total: 256 * 1024 ** 3, used: 100 * 1024 ** 3 },
+          network: { ip: '10.0.0.1', latency: 18 },
+          os: { platform: 'linux', version: 'Ubuntu 22.04', uptime: 86400 },
+        }),
+        getConfig: vi.fn().mockResolvedValue({
+          serverUrl: 'http://hospital-server:8080',
+          deviceId: 'KIOSK-MZ-082',
+          version: '2.4.0',
+        }),
+      },
+      power: {
+        restartApp:  vi.fn().mockResolvedValue(undefined),
+        quitApp:     vi.fn().mockResolvedValue(undefined),
+        rebootOS:    vi.fn().mockResolvedValue(undefined),
+        shutdownOS:  vi.fn().mockResolvedValue(undefined),
+      },
+      business: {
+        reloadPage: vi.fn().mockResolvedValue(undefined),
+      },
+    }),
+  }
+})
 
 // Mock toast to avoid side effects
 vi.mock('@/composables/useToast', () => ({
@@ -237,6 +241,26 @@ describe('DashboardPage', () => {
 
       expect(wrapper.find('[data-testid="url-display"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="url-edit-mode"]').exists()).toBe(false)
+    })
+  })
+
+  describe('Hardware error codes (Phase 16)', () => {
+    it('shows structured error code badge for error-status device', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const errorBadge = wrapper.find('[data-testid="hw-error-code"]')
+      expect(errorBadge.exists()).toBe(true)
+      expect(errorBadge.text()).toBe('E02')
+    })
+
+    it('does not show error code badge for non-error devices', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      // Only 1 device has error status with errorCode
+      const errorBadges = wrapper.findAll('[data-testid="hw-error-code"]')
+      expect(errorBadges).toHaveLength(1)
     })
   })
 })

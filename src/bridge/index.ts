@@ -11,6 +11,8 @@ export function getBridge(): IBridge {
   return bridge
 }
 
+export { BridgeError, ErrorCodes } from './types'
+
 export type {
   IBridge,
   LoginResult,

@@ -19,6 +19,11 @@ const { toasts, remove } = useToast()
           }"
           @click="remove(t.id)"
         >
+          <span
+            v-if="t.code"
+            class="mr-1.5 inline-block rounded bg-red-900/50 px-1.5 py-0.5 font-mono text-xs text-red-100"
+            data-testid="toast-error-code"
+          >{{ t.code }}</span>
           {{ t.message }}
         </div>
       </TransitionGroup>

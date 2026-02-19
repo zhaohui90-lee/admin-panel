@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useBridge } from '@/composables/useBridge'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
+import { BridgeError } from '@/bridge'
 import type { LogEntry, LogLevel } from '@/bridge'
 
 const bridge = useBridge()
@@ -32,8 +33,12 @@ async function fetchLogs() {
     })
     logs.value = result.items
     total.value = result.total
-  } catch {
-    toast.error('获取日志失败')
+  } catch (e) {
+    if (e instanceof BridgeError) {
+      toast.bridgeError(e)
+    } else {
+      toast.error('获取日志失败')
+    }
   } finally {
     loading.value = false
   }

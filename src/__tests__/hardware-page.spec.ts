@@ -183,4 +183,101 @@ describe('HardwarePage', () => {
       expect(wrapper.find('[data-testid="terminal-output"]').text()).toContain('等待命令输入')
     })
   })
+
+  describe('Terminal auto-scroll (Phase 14)', () => {
+    async function openTerminalAndSendCommand(wrapper: ReturnType<typeof mountPage>) {
+      const items = wrapper.findAll('[data-testid="device-item"]')
+      await findBtn(items[0], '调试').trigger('click')
+      await findBtn(wrapper, 'status').trigger('click')
+      await flushPromises()
+    }
+
+    it('terminal output has tracking-wide class for readability', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const items = wrapper.findAll('[data-testid="device-item"]')
+      await findBtn(items[0], '调试').trigger('click')
+
+      const terminal = wrapper.find('[data-testid="terminal-output"]')
+      expect(terminal.classes()).toContain('tracking-wide')
+    })
+
+    it('terminal output has lg:text-sm class for kiosk readability', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const items = wrapper.findAll('[data-testid="device-item"]')
+      await findBtn(items[0], '调试').trigger('click')
+
+      const terminal = wrapper.find('[data-testid="terminal-output"]')
+      expect(terminal.attributes('class')).toContain('lg:text-sm')
+    })
+
+    it('displays timestamp for each log entry', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await openTerminalAndSendCommand(wrapper)
+
+      const timestamps = wrapper.findAll('[data-testid="log-timestamp"]')
+      expect(timestamps.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('does not show scroll-to-bottom button when at bottom', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await openTerminalAndSendCommand(wrapper)
+
+      expect(wrapper.find('[data-testid="scroll-to-bottom"]').exists()).toBe(false)
+    })
+
+    it('shows scroll-to-bottom button when user scrolls up', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await openTerminalAndSendCommand(wrapper)
+
+      // Simulate user scrolling up by manipulating the terminal element
+      const terminal = wrapper.find('[data-testid="terminal-output"]')
+      // Mock scroll properties — in jsdom, scrollHeight/clientHeight are 0,
+      // so we simulate via defineProperty
+      const el = terminal.element
+      Object.defineProperty(el, 'scrollHeight', { value: 500, writable: true })
+      Object.defineProperty(el, 'clientHeight', { value: 200, writable: true })
+      Object.defineProperty(el, 'scrollTop', { value: 100, writable: true })
+
+      await terminal.trigger('scroll')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="scroll-to-bottom"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="scroll-to-bottom"]').text()).toContain('新消息')
+    })
+
+    it('hides scroll-to-bottom button after clicking it', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await openTerminalAndSendCommand(wrapper)
+
+      // Simulate user scrolled up
+      const terminal = wrapper.find('[data-testid="terminal-output"]')
+      const el = terminal.element
+      Object.defineProperty(el, 'scrollHeight', { value: 500, writable: true })
+      Object.defineProperty(el, 'clientHeight', { value: 200, writable: true })
+      Object.defineProperty(el, 'scrollTop', { value: 100, writable: true })
+
+      await terminal.trigger('scroll')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="scroll-to-bottom"]').exists()).toBe(true)
+
+      // Click the scroll-to-bottom button
+      await wrapper.find('[data-testid="scroll-to-bottom"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="scroll-to-bottom"]').exists()).toBe(false)
+    })
+  })
 })

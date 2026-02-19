@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useDeviceStore } from '@/stores/device'
 import { useToast } from '@/composables/useToast'
+import { BridgeError } from '@/bridge'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import TouchButton from '@/components/TouchButton.vue'
@@ -40,8 +41,12 @@ async function handleConfirm() {
   try {
     await confirmAction()
     toast.success('操作成功')
-  } catch {
-    toast.error('操作失败，请重试')
+  } catch (e) {
+    if (e instanceof BridgeError) {
+      toast.bridgeError(e)
+    } else {
+      toast.error('操作失败，请重试')
+    }
   } finally {
     confirmLoading.value = false
     confirmVisible.value = false
@@ -273,6 +278,11 @@ function onShutdownOS() {
                 </div>
               </template>
               <template v-else>
+                <span
+                  v-if="hw.errorCode"
+                  class="mr-2 inline-block rounded bg-red-100 px-1.5 py-0.5 font-mono text-xs font-semibold text-red-700"
+                  data-testid="hw-error-code"
+                >{{ hw.errorCode }}</span>
                 <span
                   class="text-sm lg:text-base"
                   :style="{

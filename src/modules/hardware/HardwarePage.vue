@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import { useBridge } from '@/composables/useBridge'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
+import { BridgeError } from '@/bridge'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import type { HardwareDeviceInfo, HardwareTestResult } from '@/bridge'
 
@@ -18,8 +19,12 @@ async function fetchDevices() {
   loadingDevices.value = true
   try {
     devices.value = await bridge.hardware.getDevices(auth.token!)
-  } catch {
-    toast.error('获取设备列表失败')
+  } catch (e) {
+    if (e instanceof BridgeError) {
+      toast.bridgeError(e)
+    } else {
+      toast.error('获取设备列表失败')
+    }
   } finally {
     loadingDevices.value = false
   }
@@ -52,8 +57,12 @@ async function toggleConnection(device: HardwareDeviceInfo) {
       device.connected = true
       toast.success(`${device.name} 已连接`)
     }
-  } catch {
-    toast.error('操作失败')
+  } catch (e) {
+    if (e instanceof BridgeError) {
+      toast.bridgeError(e)
+    } else {
+      toast.error('操作失败')
+    }
   } finally {
     connectingId.value = null
   }
@@ -70,6 +79,30 @@ const commandInput = ref('')
 const showKeyboard = ref(false)
 const sendingCommand = ref(false)
 const terminalLogs = ref<LogEntry[]>([])
+
+// --- Terminal auto-scroll ---
+const terminalRef = ref<HTMLElement | null>(null)
+const userScrolledUp = ref(false)
+const SCROLL_THRESHOLD = 30 // px from bottom to consider "at bottom"
+
+function onTerminalScroll() {
+  if (!terminalRef.value) return
+  const { scrollTop, scrollHeight, clientHeight } = terminalRef.value
+  userScrolledUp.value = scrollHeight - scrollTop - clientHeight > SCROLL_THRESHOLD
+}
+
+function scrollToBottom() {
+  if (terminalRef.value) {
+    terminalRef.value.scrollTop = terminalRef.value.scrollHeight
+  }
+  userScrolledUp.value = false
+}
+
+watch(terminalLogs, () => {
+  if (!userScrolledUp.value) {
+    nextTick(scrollToBottom)
+  }
+}, { deep: true })
 
 const quickCommands = ['status', 'test', 'reset']
 
@@ -98,10 +131,13 @@ async function sendCommand(cmd?: string) {
       text: result.output,
       timestamp: result.timestamp,
     })
-  } catch {
+  } catch (e) {
+    const errorText = e instanceof BridgeError
+      ? `[${e.code}] ${e.message}`
+      : '命令执行失败：通信超时'
     terminalLogs.value.push({
       type: 'error',
-      text: '命令执行失败：通信超时',
+      text: errorText,
       timestamp: Date.now(),
     })
   } finally {
@@ -220,24 +256,38 @@ function toggleKeyboard() {
       </div>
 
       <!-- Terminal output -->
-      <div
-        class="mb-3 h-56 overflow-y-auto rounded-lg border border-gray-200 bg-slate-900 p-3 font-mono text-xs leading-relaxed sm:h-72 sm:p-4 sm:text-[13px]"
-        data-testid="terminal-output"
-      >
-        <div v-if="terminalLogs.length === 0" class="text-slate-500">
-          等待命令输入... 可点击上方快捷命令或在下方输入自定义命令
+      <div class="relative mb-3">
+        <div
+          ref="terminalRef"
+          class="h-56 overflow-y-auto rounded-lg border border-gray-200 bg-slate-900 p-3 font-mono text-xs leading-relaxed tracking-wide sm:h-72 sm:p-4 sm:text-[13px] lg:text-sm"
+          data-testid="terminal-output"
+          @scroll="onTerminalScroll"
+        >
+          <div v-if="terminalLogs.length === 0" class="text-slate-500">
+            等待命令输入... 可点击上方快捷命令或在下方输入自定义命令
+          </div>
+          <div v-for="(log, i) in terminalLogs" :key="i" class="mb-2 last:mb-0">
+            <span class="mr-2 text-slate-400" data-testid="log-timestamp">{{ new Date(log.timestamp).toLocaleTimeString() }}</span>
+            <span
+              class="whitespace-pre-wrap"
+              :class="{
+                'text-blue-400': log.type === 'command',
+                'text-emerald-400': log.type === 'result',
+                'text-red-400': log.type === 'error',
+              }"
+            >{{ log.text }}</span>
+          </div>
+          <div v-if="sendingCommand" class="text-yellow-400 animate-pulse">执行中...</div>
         </div>
-        <div v-for="(log, i) in terminalLogs" :key="i" class="mb-2 last:mb-0">
-          <div
-            class="whitespace-pre-wrap"
-            :class="{
-              'text-blue-400': log.type === 'command',
-              'text-emerald-400': log.type === 'result',
-              'text-red-400': log.type === 'error',
-            }"
-          >{{ log.text }}</div>
-        </div>
-        <div v-if="sendingCommand" class="text-yellow-400 animate-pulse">执行中...</div>
+        <!-- Scroll-to-bottom hint -->
+        <button
+          v-if="userScrolledUp && terminalLogs.length > 0"
+          class="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-accent/90 px-3 py-1 text-xs font-medium text-white shadow-md transition-all hover:bg-accent"
+          data-testid="scroll-to-bottom"
+          @click="scrollToBottom"
+        >
+          ↓ 新消息
+        </button>
       </div>
 
       <!-- Command input -->

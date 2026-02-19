@@ -3,7 +3,8 @@ import { setActivePinia, createPinia } from 'pinia'
 import { useDeviceStore } from '../stores/device'
 
 // Mock the bridge module
-vi.mock('../bridge', () => {
+vi.mock('../bridge', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../bridge')>()
   const mockBridge = {
     auth: {
       login: vi.fn(),
@@ -34,6 +35,7 @@ vi.mock('../bridge', () => {
   }
 
   return {
+    ...actual,
     getBridge: () => mockBridge,
     __mockBridge: mockBridge,
   }
@@ -186,6 +188,47 @@ describe('Device Store', () => {
       const device = useDeviceStore()
       await device.updateServerUrl('http://new-server:8080')
       expect(device.config).toBeNull()
+    })
+  })
+
+  describe('error tracking (Phase 16)', () => {
+    it('has null lastError initially', () => {
+      const device = useDeviceStore()
+      expect(device.lastError).toBeNull()
+    })
+
+    it('sets lastError when fetchSystemInfo fails', async () => {
+      mockBridge.system.getSystemInfo.mockRejectedValueOnce(new Error('network error'))
+      const device = useDeviceStore()
+      await device.fetchSystemInfo()
+      expect(device.lastError).not.toBeNull()
+      expect(device.lastError?.code).toBe('E04') // BRIDGE_UNAVAILABLE
+    })
+
+    it('clears lastError on successful fetchSystemInfo', async () => {
+      const device = useDeviceStore()
+      // First: fail
+      mockBridge.system.getSystemInfo.mockRejectedValueOnce(new Error('fail'))
+      await device.fetchSystemInfo()
+      expect(device.lastError).not.toBeNull()
+      // Second: succeed
+      await device.fetchSystemInfo()
+      expect(device.lastError).toBeNull()
+    })
+
+    it('hardware list has errorCode on error-status device', () => {
+      const device = useDeviceStore()
+      const errorDevice = device.hardwareList.find(d => d.status === 'error')
+      expect(errorDevice).toBeDefined()
+      expect(errorDevice!.errorCode).toBe('E02')
+    })
+
+    it('hardware list has no errorCode on online-status devices', () => {
+      const device = useDeviceStore()
+      const onlineDevices = device.hardwareList.filter(d => d.status === 'online')
+      for (const d of onlineDevices) {
+        expect(d.errorCode).toBeUndefined()
+      }
     })
   })
 })

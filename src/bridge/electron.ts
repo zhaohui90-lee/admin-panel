@@ -1,4 +1,5 @@
 import type { IBridge } from './types'
+import { BridgeError, ErrorCodes } from './types'
 
 /**
  * kiosk-shell 通过 preload.ts 注入的原生 API（不可变契约）
@@ -21,16 +22,24 @@ declare global {
   }
 }
 
+/** Parse error code from message string like "Error: E02 ..." */
+function parseErrorCode(message?: string): string {
+  const match = message?.match(/\b(E\d{2})\b/)
+  return match?.[1] ?? ErrorCodes.BRIDGE_UNAVAILABLE
+}
+
 function unwrap<T>(result: { success: boolean; data?: T; message?: string }): T {
   if (!result.success) {
-    throw new Error(result.message ?? '操作失败')
+    const code = parseErrorCode(result.message)
+    throw new BridgeError(code, result.message ?? '操作失败')
   }
   return result.data as T
 }
 
 function unwrapVoid(result: { success: boolean; message?: string }): void {
   if (!result.success) {
-    throw new Error(result.message ?? '操作失败')
+    const code = parseErrorCode(result.message)
+    throw new BridgeError(code, result.message ?? '操作失败')
   }
 }
 
