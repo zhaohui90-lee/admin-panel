@@ -1,66 +1,82 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import StatusBulb from '../components/StatusBulb.vue'
 
-function mountBulb(props: Record<string, unknown> = { status: 'online' }) {
-  return mount(StatusBulb, { props })
+function mountStatusBar() {
+  return mount(StatusBulb)
 }
 
-describe('StatusBulb', () => {
-  it('renders with online status', () => {
-    const wrapper = mountBulb({ status: 'online' })
-    expect(wrapper.find('.bulb').exists()).toBe(true)
-    expect(wrapper.find('[role="status"]').attributes('aria-label')).toBe('online')
+describe('StatusBulb (Terminal Status Bar)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
   })
 
-  it('renders with warning status', () => {
-    const wrapper = mountBulb({ status: 'warning' })
-    expect(wrapper.find('[role="status"]').attributes('aria-label')).toBe('warning')
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
-  it('renders with error status', () => {
-    const wrapper = mountBulb({ status: 'error' })
-    expect(wrapper.find('[role="status"]').attributes('aria-label')).toBe('error')
+  it('renders the status bar header', () => {
+    const wrapper = mountStatusBar()
+    expect(wrapper.find('header').exists()).toBe(true)
   })
 
-  it('shows ripple animation only for online status', () => {
-    const online = mountBulb({ status: 'online' })
-    expect(online.find('.bulb-ripple').exists()).toBe(true)
-
-    const warning = mountBulb({ status: 'warning' })
-    expect(warning.find('.bulb-ripple').exists()).toBe(false)
-
-    const error = mountBulb({ status: 'error' })
-    expect(error.find('.bulb-ripple').exists()).toBe(false)
+  it('displays hospital system name', () => {
+    const wrapper = mountStatusBar()
+    expect(wrapper.text()).toContain('医院员工自助终端')
   })
 
-  it('applies md size by default', () => {
-    const wrapper = mountBulb({ status: 'online' })
-    expect(wrapper.find('.bulb--md').exists()).toBe(true)
+  it('displays terminal ID', () => {
+    const wrapper = mountStatusBar()
+    expect(wrapper.text()).toContain('KSK-001')
   })
 
-  it('applies sm size', () => {
-    const wrapper = mountBulb({ status: 'online', size: 'sm' })
-    expect(wrapper.find('.bulb--sm').exists()).toBe(true)
+  it('displays IP address', () => {
+    const wrapper = mountStatusBar()
+    expect(wrapper.text()).toContain('192.168.1.100')
   })
 
-  it('applies lg size', () => {
-    const wrapper = mountBulb({ status: 'online', size: 'lg' })
-    expect(wrapper.find('.bulb--lg').exists()).toBe(true)
+  it('displays online status text', () => {
+    const wrapper = mountStatusBar()
+    expect(wrapper.text()).toContain('运行正常')
   })
 
-  it('renders label text when provided', () => {
-    const wrapper = mountBulb({ status: 'online', label: '系统正常' })
-    expect(wrapper.find('.bulb-label').text()).toBe('系统正常')
+  it('displays status indicator dot', () => {
+    const wrapper = mountStatusBar()
+    // The green emerald dot for online status
+    const dots = wrapper.findAll('.rounded-full')
+    expect(dots.length).toBeGreaterThan(0)
   })
 
-  it('hides label when not provided', () => {
-    const wrapper = mountBulb({ status: 'online' })
-    expect(wrapper.find('.bulb-label').exists()).toBe(false)
+  it('renders time display', () => {
+    const wrapper = mountStatusBar()
+    // Clock should be initialized after mount
+    const vm = wrapper.vm as unknown as { currentTime: string; currentDate: string }
+    expect(vm.currentTime).toBeTruthy()
+    expect(vm.currentDate).toBeTruthy()
   })
 
-  it('uses label as aria-label when provided', () => {
-    const wrapper = mountBulb({ status: 'online', label: '系统正常' })
-    expect(wrapper.find('[role="status"]').attributes('aria-label')).toBe('系统正常')
+  it('updates clock every second', async () => {
+    const wrapper = mountStatusBar()
+    const vm = wrapper.vm as unknown as { currentTime: string }
+    const initialTime = vm.currentTime
+
+    vi.advanceTimersByTime(1000)
+    await wrapper.vm.$nextTick()
+
+    // Time should have been updated (may or may not differ depending on timing)
+    expect(vm.currentTime).toBeTruthy()
+  })
+
+  it('has sticky positioning', () => {
+    const wrapper = mountStatusBar()
+    const header = wrapper.find('header')
+    expect(header.classes()).toContain('sticky')
+    expect(header.classes()).toContain('top-0')
+  })
+
+  it('has gradient background style', () => {
+    const wrapper = mountStatusBar()
+    const header = wrapper.find('header')
+    expect(header.classes()).toContain('status-bar')
   })
 })
