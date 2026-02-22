@@ -39,11 +39,15 @@ const kb = useVirtualKeyboard<LoginField>({
 // ── Form (proxied to keyboard values) ──
 const staffId = computed({
   get: () => kb.values.value.staffId,
-  set: (v: string) => { kb.values.value.staffId = v },
+  set: (v: string) => {
+    kb.values.value.staffId = v
+  },
 })
 const password = computed({
   get: () => kb.values.value.password,
-  set: (v: string) => { kb.values.value.password = v },
+  set: (v: string) => {
+    kb.values.value.password = v
+  },
 })
 const showPwd = ref(false)
 const isLoading = ref(false)
@@ -152,9 +156,12 @@ const showTimeout = ref(false)
 
 function resetIdleTimer() {
   clearTimeout(idleTimer)
-  idleTimer = setTimeout(() => {
-    showTimeout.value = true
-  }, 5 * 60 * 1000) // 5 minutes
+  idleTimer = setTimeout(
+    () => {
+      showTimeout.value = true
+    },
+    5 * 60 * 1000,
+  ) // 5 minutes
 }
 
 function dismissTimeout() {
@@ -211,8 +218,10 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                   />
                 </svg>
               </div>
-              <h1 class="text-xl font-bold text-gray-800 tracking-tight">员工身份验证</h1>
-              <p class="text-sm text-gray-400 mt-1">请选择登录方式</p>
+              <h1 class="text-lg md:text-xl font-bold text-gray-800 tracking-tight">
+                员工身份验证
+              </h1>
+              <p class="text-xs md:text-sm text-gray-400 mt-1">请选择登录方式</p>
             </div>
 
             <!-- Tabs -->
@@ -221,7 +230,7 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                 v-for="t in tabs"
                 :key="t.id"
                 :data-testid="`tab-${t.id}`"
-                class="tab-btn flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+                class="tab-btn flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm md:text-base font-medium transition-all duration-200"
                 :class="
                   activeTab === t.id
                     ? 'bg-white text-blue-600 shadow-sm'
@@ -264,8 +273,9 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
               <!-- Staff ID -->
               <div class="mb-4">
                 <label
-                  class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"
-                >员工工号</label>
+                  class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"
+                  >员工工号</label
+                >
                 <div class="relative">
                   <div
                     class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -285,7 +295,7 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                   </div>
                   <div
                     data-testid="input-staff-id"
-                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-sm font-medium cursor-pointer select-none min-h-13 flex items-center"
+                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-xs md:text-sm font-medium cursor-pointer select-none min-h-13 flex items-center"
                     :class="kb.activeField.value === 'staffId' ? 'kiosk-input-focus' : ''"
                     @click="kb.openKeyboard('staffId')"
                   >
@@ -317,9 +327,9 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
               <!-- Password -->
               <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
-                  <label
-                    class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest"
-                  >登录密码</label>
+                  <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest"
+                    >登录密码</label
+                  >
                   <button class="text-xs text-blue-500 hover:text-blue-700 font-medium">
                     忘记密码？
                   </button>
@@ -428,19 +438,8 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                 class="btn-login w-full py-4 rounded-xl text-white font-bold text-sm tracking-wider flex items-center justify-center gap-2.5"
                 @click="handleLogin"
               >
-                <svg
-                  v-if="isLoading"
-                  class="login-spinner w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="rgba(255,255,255,.3)"
-                    stroke-width="3"
-                  />
+                <svg v-if="isLoading" class="login-spinner w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,.3)" stroke-width="3" />
                   <path
                     d="M12 2a10 10 0 019.78 12"
                     stroke="white"
@@ -612,7 +611,9 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                   :class="kb.activeField.value === 'cardNumber' ? 'kiosk-input-focus' : ''"
                   @click="kb.openKeyboard('cardNumber')"
                 >
-                  <span v-if="kb.values.value.cardNumber" class="text-gray-800">{{ kb.values.value.cardNumber }}</span>
+                  <span v-if="kb.values.value.cardNumber" class="text-gray-800">{{
+                    kb.values.value.cardNumber
+                  }}</span>
                   <span v-else class="text-slate-400">EMP-202401-001</span>
                 </div>
               </div>
@@ -637,9 +638,7 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
         data-testid="success-popup"
         class="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm"
       >
-        <div
-          class="bg-white rounded-3xl p-10 max-w-sm w-full mx-4 text-center shadow-2xl popup-in"
-        >
+        <div class="bg-white rounded-3xl p-10 max-w-sm w-full mx-4 text-center shadow-2xl popup-in">
           <div
             class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4"
           >

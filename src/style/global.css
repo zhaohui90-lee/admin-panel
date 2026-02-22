@@ -59,6 +59,9 @@ body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  min-width: 768px;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* --- 全局触控动画 --- */

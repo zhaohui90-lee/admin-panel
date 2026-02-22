@@ -42,8 +42,8 @@ onUnmounted(() => {
           </svg>
         </div>
         <div>
-          <div class="text-white font-semibold text-sm tracking-wide">医院员工自助终端</div>
-          <div class="text-blue-300 text-[10px] opacity-70 tracking-widest">
+          <div class="text-white font-semibold text-sm md:text-base tracking-wide">医院员工自助终端</div>
+          <div class="text-blue-300 text-xs md:text-sm opacity-70 tracking-widest">
             HOSPITAL SELF-SERVICE KIOSK
           </div>
         </div>
@@ -55,8 +55,8 @@ onUnmounted(() => {
             <path d="M8 21h8M12 17v4" stroke-linecap="round" />
           </svg>
           <div>
-            <div class="text-blue-400 text-[9px] uppercase tracking-widest">终端</div>
-            <div class="text-white mono text-[11px] font-medium">KSK-001</div>
+            <div class="text-blue-400 text-xs md:text-sm uppercase tracking-widest">终端</div>
+            <div class="text-white mono text-xs md:text-sm font-medium">KSK-001</div>
           </div>
         </div>
         <div class="w-px h-6 bg-white/10"></div>
@@ -66,8 +66,8 @@ onUnmounted(() => {
             <path d="M2 12h20M12 2a15.3 15.3 0 010 20" />
           </svg>
           <div>
-            <div class="text-blue-400 text-[9px] uppercase tracking-widest">IP</div>
-            <div class="text-white mono text-[11px] font-medium">192.168.1.100</div>
+            <div class="text-blue-400 text-xs md:text-sm uppercase tracking-widest">IP</div>
+            <div class="text-white mono text-xs md:text-sm font-medium">192.168.1.100</div>
           </div>
         </div>
         <div class="w-px h-6 bg-white/10"></div>
@@ -77,16 +77,16 @@ onUnmounted(() => {
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
           </div>
           <div>
-            <div class="text-blue-400 text-[9px] uppercase tracking-widest">状态</div>
-            <div class="text-emerald-400 text-[11px] font-medium">运行正常</div>
+            <div class="text-blue-400 text-xs md:text-sm uppercase tracking-widest">状态</div>
+            <div class="text-emerald-400 text-xs md:text-sm font-medium">运行正常</div>
           </div>
         </div>
         <div class="w-px h-6 bg-white/10 hidden sm:block"></div>
         <div class="hidden sm:block text-right">
-          <div class="text-white mono text-sm font-medium">
+          <div class="text-white mono text-sm md:text-base font-medium">
             {{ currentTime }}
           </div>
-          <div class="text-blue-400 text-[10px]">{{ currentDate }}</div>
+          <div class="text-blue-400 text-xs md:text-sm">{{ currentDate }}</div>
         </div>
       </div>
     </div>
