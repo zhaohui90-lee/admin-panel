@@ -175,14 +175,22 @@ describe('LoginPage', () => {
 
     it('toggles password visibility', async () => {
       const wrapper = mountPage()
+      const vm = wrapper.vm as unknown as { password: string }
+      vm.password = 'abc'
+      await wrapper.vm.$nextTick()
+
       const input = wrapper.find('[data-testid="input-password"]')
-      expect(input.attributes('type')).toBe('password')
+      // Default: masked with dots
+      expect(input.text()).toContain('●●●')
+      expect(input.text()).not.toContain('abc')
 
       await wrapper.find('[data-testid="toggle-password"]').trigger('click')
-      expect(input.attributes('type')).toBe('text')
+      // After toggle: plain text
+      expect(input.text()).toContain('abc')
 
       await wrapper.find('[data-testid="toggle-password"]').trigger('click')
-      expect(input.attributes('type')).toBe('password')
+      // After second toggle: masked again
+      expect(input.text()).toContain('●●●')
     })
 
     it('shows clear button when staff ID has value', async () => {
@@ -298,6 +306,60 @@ describe('LoginPage', () => {
       const wrapper = mountPage()
       expect(wrapper.text()).toContain('IT 服务台')
       expect(wrapper.text()).toContain('© 2025')
+    })
+  })
+
+  describe('Keyboard integration', () => {
+    it('opens keyboard when staff ID div-input is clicked', async () => {
+      const wrapper = mountPage()
+      const vm = wrapper.vm as unknown as { kb: { activeField: { value: string | null } } }
+
+      await wrapper.find('[data-testid="input-staff-id"]').trigger('click')
+      expect(vm.kb.activeField.value).toBe('staffId')
+    })
+
+    it('opens keyboard when password div-input is clicked', async () => {
+      const wrapper = mountPage()
+      const vm = wrapper.vm as unknown as { kb: { activeField: { value: string | null } } }
+
+      await wrapper.find('[data-testid="input-password"]').trigger('click')
+      expect(vm.kb.activeField.value).toBe('password')
+    })
+
+    it('opens keyboard when card number div-input is clicked', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="tab-card"]').trigger('click')
+
+      const vm = wrapper.vm as unknown as { kb: { activeField: { value: string | null } } }
+      await wrapper.find('[data-testid="input-card-number"]').trigger('click')
+      expect(vm.kb.activeField.value).toBe('cardNumber')
+    })
+
+    it('closes keyboard when switching tabs', async () => {
+      const wrapper = mountPage()
+      const vm = wrapper.vm as unknown as { kb: { activeField: { value: string | null } } }
+
+      await wrapper.find('[data-testid="input-staff-id"]').trigger('click')
+      expect(vm.kb.activeField.value).toBe('staffId')
+
+      await wrapper.find('[data-testid="tab-card"]').trigger('click')
+      expect(vm.kb.activeField.value).toBeNull()
+    })
+
+    it('staff ID div-input has focus style when active', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="input-staff-id"]').trigger('click')
+      expect(wrapper.find('[data-testid="input-staff-id"]').classes()).toContain('kiosk-input-focus')
+    })
+
+    it('password div-input shows dots when masked', async () => {
+      const wrapper = mountPage()
+      const vm = wrapper.vm as unknown as { password: string }
+      vm.password = 'abc'
+      await wrapper.vm.$nextTick()
+
+      const input = wrapper.find('[data-testid="input-password"]')
+      expect(input.text()).toContain('●●●')
     })
   })
 })

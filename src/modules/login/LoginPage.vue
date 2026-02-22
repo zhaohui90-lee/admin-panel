@@ -3,7 +3,9 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useBridge } from '@/composables/useBridge'
+import { useVirtualKeyboard } from '@/composables/useVirtualKeyboard'
 import StatusBulb from '@/components/StatusBulb.vue'
+import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -26,9 +28,23 @@ const tabs = [
   },
 ]
 
-// ── Form ──
-const staffId = ref('')
-const password = ref('')
+// ── Virtual Keyboard ──
+type LoginField = 'staffId' | 'password' | 'cardNumber'
+const kb = useVirtualKeyboard<LoginField>({
+  staffId: { type: 'text', label: '员工工号' },
+  password: { type: 'password', label: '登录密码' },
+  cardNumber: { type: 'text', label: '卡号' },
+})
+
+// ── Form (proxied to keyboard values) ──
+const staffId = computed({
+  get: () => kb.values.value.staffId,
+  set: (v: string) => { kb.values.value.staffId = v },
+})
+const password = computed({
+  get: () => kb.values.value.password,
+  set: (v: string) => { kb.values.value.password = v },
+})
 const showPwd = ref(false)
 const isLoading = ref(false)
 const error = ref('')
@@ -73,9 +89,23 @@ async function handleLogin() {
 
 function switchTab(tab: LoginTab) {
   activeTab.value = tab
+  kb.closeKeyboard()
   if (tab === 'card') {
     password.value = ''
     error.value = ''
+  }
+}
+
+function onKeyboardConfirm() {
+  if (kb.activeField.value === 'staffId') {
+    // Staff ID confirmed → jump to password
+    kb.openKeyboard('password')
+  } else if (kb.activeField.value === 'password') {
+    // Password confirmed → trigger login
+    kb.closeKeyboard()
+    handleLogin()
+  } else if (kb.activeField.value === 'cardNumber') {
+    kb.closeKeyboard()
   }
 }
 
@@ -148,7 +178,7 @@ onUnmounted(() => {
 })
 
 // Expose for tests
-defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, showTimeout })
+defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, showTimeout, kb })
 </script>
 
 <template>
@@ -253,13 +283,15 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                       <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
                     </svg>
                   </div>
-                  <input
-                    v-model="staffId"
+                  <div
                     data-testid="input-staff-id"
-                    type="text"
-                    placeholder="请输入员工工号"
-                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-gray-800 text-sm font-medium focus:outline-none"
-                  />
+                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-sm font-medium cursor-pointer select-none min-h-13 flex items-center"
+                    :class="kb.activeField.value === 'staffId' ? 'kiosk-input-focus' : ''"
+                    @click="kb.openKeyboard('staffId')"
+                  >
+                    <span v-if="staffId" class="text-gray-800">{{ staffId }}</span>
+                    <span v-else class="text-slate-400">请输入员工工号</span>
+                  </div>
                   <button
                     v-if="staffId"
                     data-testid="clear-staff-id"
@@ -309,14 +341,17 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                       <path d="M7 11V7a5 5 0 0110 0v4" />
                     </svg>
                   </div>
-                  <input
-                    v-model="password"
+                  <div
                     data-testid="input-password"
-                    :type="showPwd ? 'text' : 'password'"
-                    placeholder="请输入登录密码"
-                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-gray-800 text-sm font-medium focus:outline-none"
-                    @keyup.enter="handleLogin"
-                  />
+                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-sm font-medium cursor-pointer select-none min-h-13 flex items-center"
+                    :class="kb.activeField.value === 'password' ? 'kiosk-input-focus' : ''"
+                    @click="kb.openKeyboard('password')"
+                  >
+                    <span v-if="password" class="text-gray-800 font-mono tracking-wider">
+                      {{ showPwd ? password : '●'.repeat(password.length) }}
+                    </span>
+                    <span v-else class="text-slate-400">请输入登录密码</span>
+                  </div>
                   <button
                     data-testid="toggle-password"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -571,12 +606,15 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                     <line x1="2" y1="10" x2="22" y2="10" />
                   </svg>
                 </div>
-                <input
+                <div
                   data-testid="input-card-number"
-                  type="text"
-                  placeholder="EMP-202401-001"
-                  class="kiosk-input w-full pl-10 pr-4 py-4 rounded-xl text-sm font-mono focus:outline-none"
-                />
+                  class="kiosk-input w-full pl-10 pr-4 py-4 rounded-xl text-sm font-mono cursor-pointer select-none min-h-13 flex items-center"
+                  :class="kb.activeField.value === 'cardNumber' ? 'kiosk-input-focus' : ''"
+                  @click="kb.openKeyboard('cardNumber')"
+                >
+                  <span v-if="kb.values.value.cardNumber" class="text-gray-800">{{ kb.values.value.cardNumber }}</span>
+                  <span v-else class="text-slate-400">EMP-202401-001</span>
+                </div>
               </div>
             </div>
           </div>
@@ -627,6 +665,16 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
         </div>
       </div>
     </Teleport>
+
+    <!-- ══════════════ Virtual Keyboard ══════════════ -->
+    <VirtualKeyboard
+      v-model="kb.currentValue.value"
+      :visible="kb.keyboardVisible.value"
+      :input-type="kb.currentInputType.value"
+      :field-label="kb.currentFieldLabel.value"
+      @close="kb.closeKeyboard()"
+      @confirm="onKeyboardConfirm"
+    />
 
     <!-- ══════════════ Session Timeout Overlay ══════════════ -->
     <Teleport to="body">
@@ -712,7 +760,8 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
     background 0.18s;
 }
 
-.kiosk-input:focus {
+.kiosk-input:focus,
+.kiosk-input-focus {
   border-color: #3b82f6;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.13);

@@ -484,9 +484,14 @@ function onShutdownOS() {
       </section>
 
       <!-- Virtual Keyboard -->
-      <div v-if="showKeyboard" class="mx-auto max-w-sm pb-4 lg:max-w-100">
-        <VirtualKeyboard v-model="serverUrlInput" input-type="ip" />
-      </div>
+      <VirtualKeyboard
+        v-model="serverUrlInput"
+        :visible="showKeyboard"
+        input-type="ip"
+        field-label="服务地址"
+        @close="cancelEditUrl"
+        @confirm="saveServerUrl"
+      />
     </div>
 
     <!-- Confirm Dialog -->

@@ -1,150 +1,104 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue';
 
-const props = defineProps<{
-  status: 'online' | 'warning' | 'error'
-  size?: 'sm' | 'md' | 'lg'
-  label?: string
-}>()
+// ── 时钟 ──
+const currentTime = ref("");
+const currentDate = ref("");
+const updateClock = () => {
+  const n = new Date();
+  currentTime.value = n.toLocaleTimeString("zh-CN", {
+    hour12: false,
+  });
+  currentDate.value = n.toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  });
+};
+let clockTimer: number;
 
-const sizeClass = computed(() => {
-  switch (props.size ?? 'md') {
-    case 'sm':
-      return 'bulb--sm'
-    case 'lg':
-      return 'bulb--lg'
-    default:
-      return 'bulb--md'
-  }
-})
+onMounted(() => {
+  updateClock();
+  clockTimer = setInterval(updateClock, 1000);
+});
 
-const colorVar = computed(() => {
-  switch (props.status) {
-    case 'online':
-      return 'var(--color-success)'
-    case 'warning':
-      return 'var(--color-warning)'
-    case 'error':
-      return 'var(--color-danger)'
-  }
+onUnmounted(() => {
+  // 清除时钟更新的定时器
+  clearInterval(clockTimer);
 })
 </script>
 
 <template>
-  <div class="bulb-container">
-    <div
-      class="bulb"
-      :class="sizeClass"
-      :style="{ '--bulb-color': colorVar }"
-      role="status"
-      :aria-label="label ?? status"
-    >
-      <!-- Checkmark for online -->
-      <svg
-        v-if="props.status === 'online'"
-        class="bulb-icon"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-      </svg>
-
-      <!-- Warning icon -->
-      <svg
-        v-else-if="props.status === 'warning'"
-        class="bulb-icon"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
-      </svg>
-
-      <!-- Error icon -->
-      <svg
-        v-else
-        class="bulb-icon"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-      >
-        <path
-          d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-        />
-      </svg>
-
-      <!-- Ripple ring (online only) -->
-      <div v-if="props.status === 'online'" class="bulb-ripple" />
+  <header class="status-bar px-6 py-3 sticky top-0 z-20">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#60a5fa"
+              opacity=".35" />
+            <rect x="10.5" y="5.5" width="3" height="9" rx="1" fill="white" />
+            <rect x="7.5" y="8.5" width="9" height="3" rx="1" fill="white" />
+          </svg>
+        </div>
+        <div>
+          <div class="text-white font-semibold text-sm tracking-wide">医院员工自助终端</div>
+          <div class="text-blue-300 text-[10px] opacity-70 tracking-widest">
+            HOSPITAL SELF-SERVICE KIOSK
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3 h-3 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" stroke-linecap="round" />
+          </svg>
+          <div>
+            <div class="text-blue-400 text-[9px] uppercase tracking-widest">终端</div>
+            <div class="text-white mono text-[11px] font-medium">KSK-001</div>
+          </div>
+        </div>
+        <div class="w-px h-6 bg-white/10"></div>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3 h-3 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20M12 2a15.3 15.3 0 010 20" />
+          </svg>
+          <div>
+            <div class="text-blue-400 text-[9px] uppercase tracking-widest">IP</div>
+            <div class="text-white mono text-[11px] font-medium">192.168.1.100</div>
+          </div>
+        </div>
+        <div class="w-px h-6 bg-white/10"></div>
+        <div class="flex items-center gap-1.5">
+          <div class="relative w-3.5 h-3.5 flex items-center justify-center">
+            <span class="absolute w-3.5 h-3.5 rounded-full bg-emerald-400 opacity-30 pulse-dot"></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          </div>
+          <div>
+            <div class="text-blue-400 text-[9px] uppercase tracking-widest">状态</div>
+            <div class="text-emerald-400 text-[11px] font-medium">运行正常</div>
+          </div>
+        </div>
+        <div class="w-px h-6 bg-white/10 hidden sm:block"></div>
+        <div class="hidden sm:block text-right">
+          <div class="text-white mono text-sm font-medium">
+            {{ currentTime }}
+          </div>
+          <div class="text-blue-400 text-[10px]">{{ currentDate }}</div>
+        </div>
+      </div>
     </div>
-
-    <span v-if="label" class="bulb-label" :style="{ color: colorVar }">
-      {{ label }}
-    </span>
-  </div>
+  </header>
 </template>
 
 <style scoped>
-.bulb-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.bulb {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--bulb-color);
-  color: white;
-  box-shadow: 0 0 0 12px color-mix(in srgb, var(--bulb-color) 15%, transparent);
-}
-
-/* Sizes */
-.bulb--sm {
-  width: 20px;
-  height: 20px;
-}
-
-.bulb--md {
-  width: 80px;
-  height: 80px;
-}
-
-.bulb--lg {
-  width: 140px;
-  height: 140px;
-  box-shadow: 0 0 0 20px color-mix(in srgb, var(--bulb-color) 15%, transparent);
-}
-
-.bulb-icon {
-  width: 40%;
-  height: 40%;
-}
-
-/* Small bulb hides the icon */
-.bulb--sm .bulb-icon {
-  display: none;
-}
-
-/* Ripple animation ring */
-.bulb-ripple {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 4px solid var(--bulb-color);
-  animation: ripple 2s infinite;
-  pointer-events: none;
-}
-
-.bulb-label {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-@media (min-width: 1024px) {
-  .bulb-label {
-    font-size: 2rem;
-  }
+.status-bar {
+  background: linear-gradient(135deg,
+      #0d1b3e 0%,
+      #1a3a6b 60%,
+      #0f3460 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 </style>

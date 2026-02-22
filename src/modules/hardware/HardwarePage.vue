@@ -330,8 +330,12 @@ function toggleKeyboard() {
     </section>
 
     <!-- Virtual Keyboard -->
-    <div v-if="showKeyboard && selectedDevice" class="mx-auto max-w-2xl lg:max-w-3xl">
-      <VirtualKeyboard v-model="commandInput" />
-    </div>
+    <VirtualKeyboard
+      v-model="commandInput"
+      :visible="showKeyboard && !!selectedDevice"
+      field-label="终端命令"
+      @close="showKeyboard = false"
+      @confirm="sendCommand()"
+    />
   </div>
 </template>
