@@ -113,6 +113,29 @@ watch(
   },
 )
 
+// ── Audio feedback ──
+let audioCtx: AudioContext | null = null
+
+function beep(freq = 800, duration = 10, vol = 0.06) {
+  try {
+    if (!audioCtx) {
+      const AC = globalThis.AudioContext ?? (globalThis as never as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      if (!AC) return
+      audioCtx = new AC()
+    }
+    const osc = audioCtx.createOscillator()
+    const gain = audioCtx.createGain()
+    osc.connect(gain)
+    gain.connect(audioCtx.destination)
+    osc.frequency.value = freq
+    gain.gain.value = vol
+    osc.start()
+    osc.stop(audioCtx.currentTime + duration / 1000)
+  } catch {
+    // Audio not available — silent fallback
+  }
+}
+
 // ── Key actions ──
 function switchMode(mode: KeyboardMode) {
   kbMode.value = mode
@@ -132,6 +155,7 @@ function pressShift() {
 }
 
 function pressKey(k: string) {
+  beep(800)
   pressedKey.value = k
   setTimeout(() => {
     pressedKey.value = null
@@ -151,10 +175,12 @@ function pressKey(k: string) {
 }
 
 function pressConfirm() {
+  beep(1000, 15)
   emit('confirm')
 }
 
 function doBackspace() {
+  beep(600, 10)
   model.value = model.value.slice(0, -1)
 }
 
@@ -730,6 +756,8 @@ defineExpose({ kbMode, shiftState, kbHeight })
   cursor: pointer;
   user-select: none;
   position: relative;
+  min-height: 44px;
+  min-width: 44px;
   transition:
     background 0.1s,
     transform 0.08s,
@@ -739,6 +767,13 @@ defineExpose({ kbMode, shiftState, kbHeight })
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+.kb-key:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #3b82f6,
+    0 2px 0 rgba(0, 0, 0, 0.35);
 }
 
 .kb-key:active,

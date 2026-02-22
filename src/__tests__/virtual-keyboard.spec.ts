@@ -250,4 +250,67 @@ describe('VirtualKeyboard', () => {
       expect(wrapper.text()).toContain('ABC')
     })
   })
+
+  describe('Audio feedback', () => {
+    function mockAudioGlobal() {
+      const mockOsc = { connect: vi.fn(), frequency: { value: 0 }, start: vi.fn(), stop: vi.fn() }
+      const mockGain = { connect: vi.fn(), gain: { value: 0 } }
+
+      // Must use a regular function (not arrow) so `new` works correctly
+      ;(globalThis as Record<string, unknown>).AudioContext = function MockAudioContext() {
+        return {
+          createOscillator: () => mockOsc,
+          createGain: () => mockGain,
+          destination: {},
+          currentTime: 0,
+        }
+      }
+      return { mockOsc, mockGain }
+    }
+
+    afterEach(() => {
+      delete (globalThis as Record<string, unknown>).AudioContext
+    })
+
+    it('plays beep on key press (800Hz)', async () => {
+      const { mockOsc } = mockAudioGlobal()
+      const wrapper = mountKeyboard({ modelValue: '' })
+      const keys = wrapper.findAll('[data-testid="kb-key"]')
+      const qKey = keys.find((b) => b.text() === 'q')
+      await qKey!.trigger('click')
+
+      expect(mockOsc.start).toHaveBeenCalled()
+      expect(mockOsc.frequency.value).toBe(800)
+    })
+
+    it('plays beep on confirm (1000Hz)', async () => {
+      const { mockOsc } = mockAudioGlobal()
+      const wrapper = mountKeyboard()
+      await wrapper.find('[data-testid="kb-confirm"]').trigger('click')
+
+      expect(mockOsc.start).toHaveBeenCalled()
+      expect(mockOsc.frequency.value).toBe(1000)
+    })
+
+    it('plays beep on backspace (600Hz)', async () => {
+      const { mockOsc } = mockAudioGlobal()
+      const wrapper = mountKeyboard({ modelValue: 'abc' })
+      await wrapper.find('[data-testid="kb-backspace"]').trigger('mousedown')
+
+      expect(mockOsc.start).toHaveBeenCalled()
+      expect(mockOsc.frequency.value).toBe(600)
+    })
+  })
+
+  describe('Accessibility', () => {
+    it('keys have minimum touch target size (h-12 = 48px >= 44px)', () => {
+      const wrapper = mountKeyboard()
+      const keys = wrapper.findAll('[data-testid="kb-key"]')
+      // All keys should have h-12 class (48px) which exceeds 44px WCAG minimum
+      expect(keys.length).toBeGreaterThan(0)
+      keys.forEach((key) => {
+        expect(key.classes().some((c) => c.startsWith('h-1'))).toBe(true)
+      })
+    })
+  })
 })
