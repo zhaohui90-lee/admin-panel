@@ -38,14 +38,11 @@ describe('LoginPage', () => {
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="mode-card"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="mode-password"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="mode-scan"]').exists()).toBe(false)
     })
 
-    it('shows scan and password nav buttons in card mode', () => {
+    it('shows password nav button in card mode', () => {
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="tab-scan"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="tab-password"]').exists()).toBe(true)
-      // tab-card doesn't exist when already in card mode
       expect(wrapper.find('[data-testid="tab-card"]').exists()).toBe(false)
     })
 
@@ -56,13 +53,6 @@ describe('LoginPage', () => {
       expect(wrapper.find('[data-testid="mode-card"]').exists()).toBe(false)
     })
 
-    it('switches to scan mode on tab click', async () => {
-      const wrapper = mountPage()
-      await wrapper.find('[data-testid="tab-scan"]').trigger('click')
-      expect(wrapper.find('[data-testid="mode-scan"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="mode-card"]').exists()).toBe(false)
-    })
-
     it('switches back to card mode from password mode', async () => {
       const wrapper = mountPage()
       await wrapper.find('[data-testid="tab-password"]').trigger('click')
@@ -70,31 +60,15 @@ describe('LoginPage', () => {
       expect(wrapper.find('[data-testid="mode-card"]').exists()).toBe(true)
     })
 
-    it('switches back to card mode from scan mode', async () => {
-      const wrapper = mountPage()
-      await wrapper.find('[data-testid="tab-scan"]').trigger('click')
-      await wrapper.find('[data-testid="tab-card"]').trigger('click')
-      expect(wrapper.find('[data-testid="mode-card"]').exists()).toBe(true)
-    })
-
-    it('tab-card is active (nav-btn--active) when returning from password mode', async () => {
+    it('tab-card is active (nav-btn--active) when in password mode', async () => {
       const wrapper = mountPage()
       await wrapper.find('[data-testid="tab-password"]').trigger('click')
       const cardBtn = wrapper.find('[data-testid="tab-card"]')
       expect(cardBtn.classes()).toContain('nav-btn--active')
     })
 
-    it('tab-card is active (nav-btn--active) when returning from scan mode', async () => {
+    it('nav button does not have nav-btn--active class in card mode', () => {
       const wrapper = mountPage()
-      await wrapper.find('[data-testid="tab-scan"]').trigger('click')
-      const cardBtn = wrapper.find('[data-testid="tab-card"]')
-      expect(cardBtn.classes()).toContain('nav-btn--active')
-    })
-
-    it('non-active nav buttons do not have nav-btn--active class', () => {
-      const wrapper = mountPage()
-      // In card mode, both nav buttons (scan + password) are inactive
-      expect(wrapper.find('[data-testid="tab-scan"]').classes()).not.toContain('nav-btn--active')
       expect(wrapper.find('[data-testid="tab-password"]').classes()).not.toContain('nav-btn--active')
     })
   })
@@ -207,17 +181,12 @@ describe('LoginPage', () => {
       expect(vm.showKeyboard).toBe(false)
     })
 
-    it('does not show keyboard in card or scan mode', async () => {
+    it('does not show keyboard in card mode', () => {
       const wrapper = mountPage()
       const vm = wrapper.vm as unknown as { showKeyboard: boolean }
 
-      // Card mode - no keyboard
       expect(vm.showKeyboard).toBe(false)
       expect(wrapper.findComponent({ name: 'VirtualKeyboard' }).exists()).toBe(false)
-
-      // Scan mode - no keyboard
-      await wrapper.find('[data-testid="tab-scan"]').trigger('click')
-      expect(vm.showKeyboard).toBe(false)
     })
   })
 })

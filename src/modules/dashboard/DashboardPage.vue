@@ -484,7 +484,7 @@ function onShutdownOS() {
       </section>
 
       <!-- Virtual Keyboard -->
-      <div v-if="showKeyboard" class="flex justify-center pb-4">
+      <div v-if="showKeyboard" class="mx-auto max-w-sm pb-4 lg:max-w-100">
         <VirtualKeyboard v-model="serverUrlInput" input-type="ip" />
       </div>
     </div>

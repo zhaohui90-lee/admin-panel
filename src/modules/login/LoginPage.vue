@@ -11,7 +11,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const bridge = useBridge()
 
-type LoginMode = 'card' | 'scan' | 'password'
+type LoginMode = 'card' | 'password'
 const activeMode = ref<LoginMode>('card')
 
 const password = ref('')
@@ -60,20 +60,10 @@ async function handleLogin() {
   }
 }
 
-// Bottom nav state machine (follows login-1.html prototype)
-// card  → left=scan,     right=password
-// scan  → left=card(★),  right=password
-// pass  → left=scan,     right=card(★)
+// Bottom nav: card ↔ password toggle
 type NavBtn = { mode: LoginMode; label: string; testid: string; active: boolean }
 
-const leftBtn = computed<NavBtn>(() => {
-  if (activeMode.value === 'scan') {
-    return { mode: 'card', label: '返回刷卡', testid: 'tab-card', active: true }
-  }
-  return { mode: 'scan', label: '扫码登录', testid: 'tab-scan', active: false }
-})
-
-const rightBtn = computed<NavBtn>(() => {
+const navBtn = computed<NavBtn>(() => {
   if (activeMode.value === 'password') {
     return { mode: 'card', label: '返回刷卡', testid: 'tab-card', active: true }
   }
@@ -159,29 +149,6 @@ const rightBtn = computed<NavBtn>(() => {
             </p>
           </div>
 
-          <!-- Scan mode -->
-          <div
-            v-else-if="activeMode === 'scan'"
-            key="scan"
-            class="flex flex-col items-center text-center"
-            data-testid="mode-scan"
-          >
-            <div class="hero-icon hero-icon--square mb-8 lg:mb-10">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-              </svg>
-            </div>
-            <h2 class="mb-4 text-4xl font-extrabold lg:text-5xl" style="color: var(--color-text-primary);">
-              扫码登录
-            </h2>
-            <p class="text-lg lg:text-2xl" style="color: var(--color-text-secondary);">
-              请使用企业微信 / 钉钉扫码
-            </p>
-          </div>
-
           <!-- Password mode -->
           <div
             v-else
@@ -234,22 +201,14 @@ const rightBtn = computed<NavBtn>(() => {
       </div>
 
       <!-- Bottom Navigation -->
-      <div class="grid grid-cols-2 gap-5 px-8 pb-8 lg:gap-8 lg:px-16 lg:pb-12">
+      <div class="px-8 pb-8 lg:px-16 lg:pb-12">
         <button
-          class="nav-btn"
-          :class="{ 'nav-btn--active': leftBtn.active }"
-          :data-testid="leftBtn.testid"
-          @click="switchMode(leftBtn.mode)"
+          class="nav-btn w-full"
+          :class="{ 'nav-btn--active': navBtn.active }"
+          :data-testid="navBtn.testid"
+          @click="switchMode(navBtn.mode)"
         >
-          {{ leftBtn.label }}
-        </button>
-        <button
-          class="nav-btn"
-          :class="{ 'nav-btn--active': rightBtn.active }"
-          :data-testid="rightBtn.testid"
-          @click="switchMode(rightBtn.mode)"
-        >
-          {{ rightBtn.label }}
+          {{ navBtn.label }}
         </button>
       </div>
 
@@ -291,10 +250,6 @@ const rightBtn = computed<NavBtn>(() => {
 .hero-icon svg {
   width: 42%;
   height: 42%;
-}
-
-.hero-icon--square {
-  border-radius: var(--touch-radius-lg);
 }
 
 /* Password display */

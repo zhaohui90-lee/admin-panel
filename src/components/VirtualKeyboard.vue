@@ -100,18 +100,18 @@ function switchToNumpad() {
   <!-- Numpad layout -->
   <div
     v-if="isNumpad && !showFullKeyboard"
-    class="w-full max-w-xs rounded-xl border border-border bg-card p-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)] sm:rounded-2xl sm:p-3"
+    class="w-full rounded-2xl border-[1.5px] border-border bg-card p-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] select-none sm:rounded-[20px] sm:p-2.5 lg:rounded-3xl lg:p-3.5"
     data-testid="numpad"
   >
     <div
       v-for="(row, rowIndex) in numpadRows"
       :key="rowIndex"
-      class="mb-1.5 flex justify-center gap-1.5 sm:mb-2 sm:gap-2"
+      class="mb-2 flex justify-center gap-2 sm:mb-2.5 sm:gap-2.5 lg:mb-3 lg:gap-3"
     >
       <button
         v-for="key in row"
         :key="key"
-        class="flex h-14 w-18 items-center justify-center rounded-lg border border-border bg-surface text-lg font-semibold text-text-primary transition-all duration-150 hover:bg-gray-100 active:scale-95 active:bg-gray-200 sm:h-16 sm:w-20 sm:rounded-xl sm:text-xl lg:h-18 lg:w-22"
+        class="flex h-16 min-w-20 flex-1 items-center justify-center rounded-xl border-[1.5px] border-border bg-surface text-[1.375rem] font-semibold text-text-primary shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-18 sm:rounded-[14px] sm:text-2xl lg:h-20 lg:rounded-2xl lg:text-[1.75rem]"
         data-testid="numpad-key"
         @click="onNumpadKey(key)"
       >
@@ -120,25 +120,25 @@ function switchToNumpad() {
     </div>
 
     <!-- Numpad bottom row: ABC + Backspace + Clear -->
-    <div class="flex justify-center gap-1.5 sm:gap-2">
+    <div class="flex justify-center gap-2 sm:gap-2.5 lg:gap-3">
       <button
-        class="flex h-12 flex-1 items-center justify-center rounded-lg border border-border bg-surface text-xs font-medium text-text-secondary transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-14 sm:rounded-xl sm:text-sm"
+        class="flex h-13 flex-1 items-center justify-center rounded-xl border-[1.5px] border-border bg-surface text-sm font-semibold text-text-secondary shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-14.5 sm:rounded-[14px] sm:text-[0.9375rem] lg:h-16 lg:rounded-2xl lg:text-base"
         data-testid="numpad-switch-abc"
         @click="switchToFullKeyboard"
       >
         ABC
       </button>
       <button
-        class="flex h-12 flex-1 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-14 sm:rounded-xl"
+        class="flex h-13 flex-1 items-center justify-center rounded-xl border-[1.5px] border-border bg-surface text-text-secondary shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-14.5 sm:rounded-[14px] lg:h-16 lg:rounded-2xl"
         data-testid="numpad-backspace"
         @click="onBackspace"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" viewBox="0 0 20 20" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5.5 sm:w-5.5 lg:h-6 lg:w-6" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v6a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4.415-4.414a1 1 0 010-1.414l4.414-4.414zm4 2.414a1 1 0 00-1.414 1.414L10.586 10l-1.293 1.293a1 1 0 101.414 1.414L12 11.414l1.293 1.293a1 1 0 001.414-1.414L13.414 10l1.293-1.293a1 1 0 00-1.414-1.414L12 8.586l-1.293-1.293z" clip-rule="evenodd" />
         </svg>
       </button>
       <button
-        class="flex h-12 flex-1 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-xs font-medium text-red-600 transition-all duration-150 hover:bg-red-100 active:bg-red-200 sm:h-14 sm:rounded-xl sm:text-sm"
+        class="flex h-13 flex-1 items-center justify-center rounded-xl border-[1.5px] border-red-300 bg-red-50 text-sm font-semibold text-danger shadow-[0_3px_0_#fca5a5] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-red-200 active:shadow-none sm:h-14.5 sm:rounded-[14px] sm:text-[0.9375rem] lg:h-16 lg:rounded-2xl lg:text-base"
         @click="onClear"
       >
         清空
@@ -149,31 +149,26 @@ function switchToNumpad() {
   <!-- QWERTY layout (default, or when numpad user switches to full) -->
   <div
     v-else
-    class="w-full max-w-2xl rounded-xl border border-border bg-card p-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)] sm:rounded-2xl sm:p-3"
+    class="w-full rounded-2xl border-[1.5px] border-border bg-card p-2 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] select-none sm:rounded-[20px] sm:p-2.5 lg:rounded-3xl lg:p-3.5"
     data-testid="qwerty"
   >
     <div
       v-for="(row, rowIndex) in displayRows"
       :key="rowIndex"
-      class="mb-1.5 flex justify-center gap-1 sm:mb-2 sm:gap-1.5"
+      class="mb-1.5 flex justify-center gap-1.25 sm:mb-1.75 sm:gap-1.5 lg:mb-2 lg:gap-1.75"
     >
       <!-- Caps Lock -->
       <button
         v-if="rowIndex === 2 && !isNumberMode"
-        class="flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-150 sm:h-12 sm:w-14 sm:rounded-lg"
+        class="flex h-11 w-12 shrink-0 items-center justify-center rounded-lg border-[1.5px] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:shadow-none sm:h-12 sm:w-14 sm:rounded-[10px] lg:h-14 lg:w-17 lg:rounded-xl"
         :class="
           isCaps
-            ? 'bg-accent text-white'
-            : 'border border-border bg-surface text-text-secondary hover:bg-gray-100 active:bg-gray-200'
+            ? 'border-accent bg-accent text-white shadow-[0_3px_0_var(--color-accent-dark)] active:bg-accent-dark'
+            : 'border-border bg-surface text-text-secondary shadow-[0_3px_0_var(--color-border)] active:bg-deep'
         "
         @click="toggleCaps"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 sm:h-5 sm:w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5.5 sm:w-5.5 lg:h-6 lg:w-6" viewBox="0 0 20 20" fill="currentColor">
           <path
             fill-rule="evenodd"
             d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
@@ -186,7 +181,7 @@ function switchToNumpad() {
       <button
         v-for="key in row"
         :key="key"
-        class="flex h-10 w-8 items-center justify-center rounded-md border border-border bg-surface text-sm font-medium text-text-primary transition-all duration-150 hover:bg-gray-100 active:scale-95 active:bg-gray-200 sm:h-12 sm:w-12 sm:rounded-lg sm:text-base"
+        class="flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg border-[1.5px] border-border bg-surface text-[0.9375rem] font-semibold text-text-primary shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-12 sm:rounded-[10px] sm:text-base lg:h-14 lg:rounded-xl lg:text-lg"
         @click="onKey(key)"
       >
         {{ key }}
@@ -195,15 +190,10 @@ function switchToNumpad() {
       <!-- Backspace -->
       <button
         v-if="rowIndex === 2"
-        class="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-text-secondary transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-12 sm:w-14 sm:rounded-lg"
+        class="flex h-11 w-12 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-border bg-surface text-text-secondary shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-12 sm:w-14 sm:rounded-[10px] lg:h-14 lg:w-17 lg:rounded-xl"
         @click="onBackspace"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 sm:h-5 sm:w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5.5 sm:w-5.5 lg:h-6 lg:w-6" viewBox="0 0 20 20" fill="currentColor">
           <path
             fill-rule="evenodd"
             d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v6a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4.415-4.414a1 1 0 010-1.414l4.414-4.414zm4 2.414a1 1 0 00-1.414 1.414L10.586 10l-1.293 1.293a1 1 0 101.414 1.414L12 11.414l1.293 1.293a1 1 0 001.414-1.414L13.414 10l1.293-1.293a1 1 0 00-1.414-1.414L12 8.586l-1.293-1.293z"
@@ -214,13 +204,13 @@ function switchToNumpad() {
     </div>
 
     <!-- Bottom row -->
-    <div class="flex justify-center gap-1 sm:gap-1.5">
+    <div class="flex justify-center gap-1.25 sm:gap-1.5 lg:gap-1.75">
       <button
-        class="flex h-10 w-16 items-center justify-center rounded-md text-xs font-medium transition-all duration-150 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
+        class="flex h-11 w-18 shrink-0 items-center justify-center rounded-lg border-[1.5px] text-[0.8125rem] font-semibold transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:shadow-none sm:h-12 sm:w-21 sm:rounded-[10px] sm:text-sm lg:h-14 lg:w-24 lg:rounded-xl lg:text-base"
         :class="
           isNumberMode
-            ? 'bg-accent text-white'
-            : 'border border-border bg-surface text-text-secondary hover:bg-gray-100 active:bg-gray-200'
+            ? 'border-accent bg-accent text-white shadow-[0_3px_0_var(--color-accent-dark)] active:bg-accent-dark'
+            : 'border-border bg-surface text-text-secondary shadow-[0_3px_0_var(--color-border)] active:bg-deep'
         "
         @click="isNumpad && !showFullKeyboard ? switchToNumpad() : toggleNumberMode()"
       >
@@ -230,7 +220,7 @@ function switchToNumpad() {
       <!-- Back to numpad (only when numpad user switched to full keyboard) -->
       <button
         v-if="isNumpad && showFullKeyboard"
-        class="flex h-10 w-16 items-center justify-center rounded-md border border-border bg-surface text-xs font-medium text-text-secondary transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
+        class="flex h-11 w-18 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-border bg-surface text-[0.8125rem] font-semibold text-text-secondary shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-12 sm:w-21 sm:rounded-[10px] sm:text-sm lg:h-14 lg:w-24 lg:rounded-xl lg:text-base"
         data-testid="switch-numpad"
         @click="switchToNumpad"
       >
@@ -238,14 +228,14 @@ function switchToNumpad() {
       </button>
 
       <button
-        class="flex h-10 flex-1 items-center justify-center rounded-md border border-border bg-surface text-xs text-text-muted transition-all duration-150 hover:bg-gray-100 active:bg-gray-200 sm:h-12 sm:rounded-lg sm:text-sm"
+        class="flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg border-[1.5px] border-border bg-surface text-[0.8125rem] text-text-muted shadow-[0_3px_0_var(--color-border)] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-deep active:shadow-none sm:h-12 sm:rounded-[10px] sm:text-sm lg:h-14 lg:rounded-xl lg:text-base"
         @click="onSpace"
       >
         空格
       </button>
 
       <button
-        class="flex h-10 w-16 items-center justify-center rounded-md border border-red-200 bg-red-50 text-xs font-medium text-red-600 transition-all duration-150 hover:bg-red-100 active:bg-red-200 sm:h-12 sm:w-20 sm:rounded-lg sm:text-sm"
+        class="flex h-11 w-18 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-red-300 bg-red-50 text-[0.8125rem] font-semibold text-danger shadow-[0_3px_0_#fca5a5] transition-[transform,box-shadow,background] duration-75 active:translate-y-0.75 active:bg-red-200 active:shadow-none sm:h-12 sm:w-21 sm:rounded-[10px] sm:text-sm lg:h-14 lg:w-24 lg:rounded-xl lg:text-base"
         @click="onClear"
       >
         清空

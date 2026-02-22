@@ -330,7 +330,7 @@ function toggleKeyboard() {
     </section>
 
     <!-- Virtual Keyboard -->
-    <div v-if="showKeyboard && selectedDevice" class="flex justify-center">
+    <div v-if="showKeyboard && selectedDevice" class="mx-auto max-w-2xl lg:max-w-3xl">
       <VirtualKeyboard v-model="commandInput" />
     </div>
   </div>
