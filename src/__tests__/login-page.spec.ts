@@ -64,12 +64,12 @@ describe('LoginPage', () => {
       const wrapper = mountPage()
       await wrapper.find('[data-testid="tab-password"]').trigger('click')
       const cardBtn = wrapper.find('[data-testid="tab-card"]')
-      expect(cardBtn.classes()).toContain('nav-btn--active')
+      expect(cardBtn.classes()).toContain('bg-blue-600')
     })
 
     it('nav button does not have nav-btn--active class in card mode', () => {
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="tab-password"]').classes()).not.toContain('nav-btn--active')
+      expect(wrapper.find('[data-testid="tab-password"]').classes()).not.toContain('bg-blue-600')
     })
   })
 
@@ -163,7 +163,7 @@ describe('LoginPage', () => {
       expect(wrapper.findComponent({ name: 'VirtualKeyboard' }).exists()).toBe(false)
 
       // Click password display to show keyboard again
-      const passwordDisplay = wrapper.find('.password-display')
+      const passwordDisplay = wrapper.find('[data-testid="password-display"]')
       await passwordDisplay.trigger('click')
 
       expect(vm.showKeyboard).toBe(true)
