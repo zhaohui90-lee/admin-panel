@@ -54,7 +54,7 @@ const symRows = [
 // ── Computed display value ──
 const displayValue = computed(() => {
   if (props.inputType === 'password' && model.value) {
-    return '●'.repeat(model.value.length)
+    return '● '.repeat(model.value.length)
   }
   return model.value
 })
@@ -119,7 +119,9 @@ let audioCtx: AudioContext | null = null
 function beep(freq = 800, duration = 10, vol = 0.06) {
   try {
     if (!audioCtx) {
-      const AC = globalThis.AudioContext ?? (globalThis as never as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      const AC =
+        globalThis.AudioContext ??
+        (globalThis as never as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
       if (!AC) return
       audioCtx = new AC()
     }
@@ -244,12 +246,7 @@ defineExpose({ kbMode, shiftState, kbHeight })
 
   <!-- Keyboard -->
   <Transition name="kb-slide">
-    <div
-      v-if="visible"
-      ref="kbRef"
-      data-testid="keyboard-shell"
-      class="keyboard-shell z-50"
-    >
+    <div v-if="visible" ref="kbRef" data-testid="keyboard-shell" class="keyboard-shell z-50">
       <!-- Drag handle + Top bar -->
       <div class="keyboard-topbar px-4 pb-3">
         <div class="kb-drag-handle"></div>
