@@ -40,7 +40,7 @@ const currentPageTitle = computed(
 </script>
 
 <template>
-  <div class="flex h-screen" style="background: var(--color-deep);">
+  <div class="industrial-grid-bg flex h-screen" style="background: var(--color-deep);">
 
     <!-- ═══════════════════════════════════════════════
          KIOSK SIDEBAR (hidden on mobile, lg+)
