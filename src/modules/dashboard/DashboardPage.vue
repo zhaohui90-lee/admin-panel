@@ -13,6 +13,7 @@ import DeviceInfoBanner from './components/DeviceInfoBanner.vue'
 import TransactionCard from './components/TransactionCard.vue'
 import NetworkCard from './components/NetworkCard.vue'
 import SystemResourceCard from './components/SystemResourceCard.vue'
+import HardwareCheckPanel from './components/HardwareCheckPanel.vue'
 
 const device = useDeviceStore()
 const maintenance = useMaintenanceStore()
@@ -131,113 +132,8 @@ function onShutdownOS() {
         <SystemResourceCard />
       </div>
 
-      <!-- ── Hardware Status List ──────────────────────── -->
-      <section
-        class="rounded-2xl border shadow-sm"
-        style="background: var(--color-card); border-color: var(--color-border)"
-        data-testid="hw-list"
-      >
-        <div class="border-b px-6 py-5 lg:px-8 lg:py-6" style="border-color: var(--color-border)">
-          <h2
-            class="flex items-center gap-3 text-base font-bold lg:text-lg"
-            style="color: var(--color-text-primary)"
-          >
-            <span
-              class="h-5 w-1 rounded-sm"
-              style="background: var(--color-accent); opacity: 0.7"
-            />
-            硬件自检状态
-          </h2>
-        </div>
-
-        <div class="divide-y" style="border-color: var(--color-border)">
-          <div
-            v-for="hw in device.hardwareList"
-            :key="hw.name"
-            class="flex min-h-[64px] flex-col justify-center gap-2 px-6 py-4 lg:min-h-[72px] lg:flex-row lg:items-center lg:gap-0 lg:px-8"
-            data-testid="hw-item"
-          >
-            <!-- Status indicator + Name -->
-            <div class="flex items-center gap-4 lg:w-44">
-              <!-- Glow dot -->
-              <span
-                class="h-4 w-4 shrink-0 rounded-full"
-                :class="{
-                  'bg-success': hw.status === 'online',
-                  'bg-warning': hw.status === 'warning',
-                  'bg-danger': hw.status === 'error',
-                }"
-                :style="{
-                  boxShadow:
-                    hw.status === 'online'
-                      ? '0 0 8px rgba(34,197,94,0.6)'
-                      : hw.status === 'warning'
-                        ? '0 0 8px rgba(245,158,11,0.6)'
-                        : '0 0 8px rgba(239,68,68,0.6)',
-                }"
-              />
-              <span
-                class="text-base font-medium lg:text-lg"
-                style="color: var(--color-text-primary)"
-                >{{ hw.name }}</span
-              >
-            </div>
-
-            <!-- Detail / Progress -->
-            <div class="flex-1 pl-8 lg:mx-6 lg:pl-0">
-              <template v-if="hw.progress !== undefined">
-                <div class="mb-2 text-sm lg:text-base" style="color: var(--color-text-muted)">
-                  {{ hw.detail }}
-                </div>
-                <div
-                  class="h-3 w-full overflow-hidden rounded-full lg:h-4"
-                  style="background: #e2e8f0"
-                >
-                  <div
-                    class="h-full rounded-full transition-all duration-500"
-                    :class="{
-                      'bg-success': hw.status === 'online',
-                      'bg-warning': hw.status === 'warning',
-                      'bg-danger': hw.status === 'error',
-                    }"
-                    :style="{ width: hw.progress + '%' }"
-                  />
-                </div>
-              </template>
-              <template v-else>
-                <span
-                  v-if="hw.errorCode"
-                  class="mr-2 inline-block rounded bg-red-100 px-1.5 py-0.5 font-mono text-xs font-semibold text-red-700"
-                  data-testid="hw-error-code"
-                >{{ hw.errorCode }}</span>
-                <span
-                  class="text-sm lg:text-base"
-                  :style="{
-                    color:
-                      hw.status === 'error' ? 'var(--color-danger)' : 'var(--color-text-muted)',
-                  }"
-                >
-                  {{ hw.detail }}
-                </span>
-              </template>
-            </div>
-
-            <!-- Status label -->
-            <div class="pl-8 lg:w-24 lg:pl-0 lg:text-right">
-              <span
-                class="text-sm font-semibold lg:text-base"
-                :class="{
-                  'text-success': hw.status === 'online',
-                  'text-warning': hw.status === 'warning',
-                  'text-danger': hw.status === 'error',
-                }"
-              >
-                {{ hw.statusLabel }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- ── Hardware Check Panel ──────────────────────── -->
+      <HardwareCheckPanel />
 
       <!-- ── Action Buttons ────────────────────────────── -->
       <section
