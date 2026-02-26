@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useDeviceStore } from '@/stores/device'
+import { useMaintenanceStore } from '@/stores/maintenance'
 import { useToast } from '@/composables/useToast'
 import { useKeyboardScroll } from '@/composables/useKeyboardScroll'
 import { BridgeError } from '@/bridge'
@@ -8,18 +9,22 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import TouchButton from '@/components/TouchButton.vue'
 import TouchInput from '@/components/TouchInput.vue'
+import DeviceInfoBanner from './components/DeviceInfoBanner.vue'
 
 const device = useDeviceStore()
+const maintenance = useMaintenanceStore()
 const toast = useToast()
 
 // --- Lifecycle: init data + polling ---
 onMounted(async () => {
   await device.fetchConfig()
   device.startPolling(5000)
+  maintenance.startFluctuation()
 })
 
 onUnmounted(() => {
   device.stopPolling()
+  maintenance.stopFluctuation()
 })
 
 // --- Confirm dialog ---
@@ -113,29 +118,8 @@ function onShutdownOS() {
 <template>
   <div>
     <div class="mx-auto max-w-5xl space-y-5 lg:space-y-6">
-      <!-- ── Page Header ───────────────────────────────── -->
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1
-            class="text-xl font-bold tracking-wide lg:text-2xl"
-            style="color: var(--color-text-primary)"
-          >
-            设备详情：
-            <span class="font-mono font-medium" style="color: var(--color-accent)">
-              {{ device.config?.deviceId ?? 'SZ-SH-082' }}
-            </span>
-          </h1>
-          <p class="mt-1 font-mono text-xs lg:text-sm" style="color: var(--color-text-muted)">
-            最后同步 2026-02-12 14:30:05
-          </p>
-        </div>
-        <div
-          class="flex items-center gap-2 self-start rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 lg:px-5 lg:py-2.5 lg:text-base"
-        >
-          <span class="h-2 w-2 rounded-full bg-emerald-500 lg:h-2.5 lg:w-2.5" />
-          运行中
-        </div>
-      </div>
+      <!-- ── Device Info Banner ────────────────────────── -->
+      <DeviceInfoBanner />
 
       <!-- ── Status Cards ──────────────────────────────── -->
       <div

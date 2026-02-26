@@ -67,16 +67,16 @@
 **Goal**: 实现运行状态页顶部的三列设备信息卡
 
 **Tasks**:
-- [ ] 3.1 左列：蓝色医疗十字图标 + 设备编号(mono 24px 白色) + 部署位置(灰色小字)
-- [ ] 3.2 中列：状态指示灯(running/warning/error/offline 颜色 + 动画) + 运行时长("XX天XX时XX分")
-- [ ] 3.3 右列：同步图标 + "最后同步"时间 + "X分钟前"每秒更新 + 手动同步按钮(spinner 2秒)
-- [ ] 3.4 卡片样式：`rounded-2xl px-8 py-5`，深色渐变背景，1px 白色边框
+- [x] 3.1 左列：蓝色医疗十字图标 + 设备编号(mono 24px 白色) + 部署位置(灰色小字)
+- [x] 3.2 中列：状态指示灯(running/warning/error/offline 颜色 + 动画) + 运行时长("XX天XX时XX分")
+- [x] 3.3 右列：同步图标 + "最后同步"时间 + "X分钟前"每秒更新 + 手动同步按钮(spinner 2秒)
+- [x] 3.4 卡片样式：`rounded-2xl px-8 py-5`，深色渐变背景，1px 白色边框
 
 **Success Criteria**: 横幅三列在宽屏正确布局，状态灯动画正常，同步时间实时更新
 
 **Tests**: 各状态颜色/动画、uptime 格式化、同步时间相对计算
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
