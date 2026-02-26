@@ -24,11 +24,6 @@ const router = createRouter({
           component: () => import('@/modules/dashboard/DashboardPage.vue'),
         },
         {
-          path: 'logs',
-          name: 'logs',
-          component: () => import('@/modules/logs/LogsPage.vue'),
-        },
-        {
           path: 'settings',
           name: 'settings',
           component: () => import('@/modules/settings/SettingsPage.vue'),
