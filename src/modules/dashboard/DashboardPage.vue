@@ -10,6 +10,9 @@ import VirtualKeyboard from '@/components/VirtualKeyboard.vue'
 import TouchButton from '@/components/TouchButton.vue'
 import TouchInput from '@/components/TouchInput.vue'
 import DeviceInfoBanner from './components/DeviceInfoBanner.vue'
+import TransactionCard from './components/TransactionCard.vue'
+import NetworkCard from './components/NetworkCard.vue'
+import SystemResourceCard from './components/SystemResourceCard.vue'
 
 const device = useDeviceStore()
 const maintenance = useMaintenanceStore()
@@ -121,75 +124,11 @@ function onShutdownOS() {
       <!-- ── Device Info Banner ────────────────────────── -->
       <DeviceInfoBanner />
 
-      <!-- ── Status Cards ──────────────────────────────── -->
-      <div
-        class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5"
-        data-testid="status-cards"
-      >
-        <!-- 今日交易数 -->
-        <div
-          class="flex min-h-[120px] flex-col justify-between rounded-2xl border p-6 shadow-sm lg:min-h-[140px] lg:p-8"
-          style="background: var(--color-card); border-color: var(--color-border)"
-          data-testid="card-transactions"
-        >
-          <div
-            class="flex items-center justify-between text-sm lg:text-base"
-            style="color: var(--color-text-muted)"
-          >
-            <span>今日交易数</span>
-            <span class="opacity-60">(笔)</span>
-          </div>
-          <div class="text-4xl font-bold lg:text-5xl" style="color: var(--color-text-primary)">
-            1,284
-          </div>
-        </div>
-
-        <!-- 网络延迟 -->
-        <div
-          class="flex min-h-[120px] flex-col justify-between rounded-2xl border p-6 shadow-sm lg:min-h-[140px] lg:p-8"
-          style="background: var(--color-card); border-color: var(--color-border)"
-          data-testid="card-latency"
-        >
-          <div
-            class="flex items-center justify-between text-sm lg:text-base"
-            style="color: var(--color-text-muted)"
-          >
-            <span>网络延迟</span>
-            <span class="opacity-60">(Ping)</span>
-          </div>
-          <div
-            class="text-4xl font-bold lg:text-5xl"
-            :style="{
-              color:
-                device.networkLatency < 50
-                  ? 'var(--color-success)'
-                  : device.networkLatency < 100
-                    ? 'var(--color-warning)'
-                    : 'var(--color-danger)',
-            }"
-            data-testid="latency-value"
-          >
-            {{ device.networkLatency }}ms
-          </div>
-        </div>
-
-        <!-- 系统 CPU -->
-        <div
-          class="flex min-h-[120px] flex-col justify-between rounded-2xl border p-6 shadow-sm sm:col-span-2 lg:col-span-1 lg:min-h-[140px] lg:p-8"
-          style="background: var(--color-card); border-color: var(--color-border)"
-          data-testid="card-cpu"
-        >
-          <div
-            class="flex items-center justify-between text-sm lg:text-base"
-            style="color: var(--color-text-muted)"
-          >
-            <span>系统 CPU</span>
-            <span class="opacity-60">内存 {{ device.memoryPercent }}%</span>
-          </div>
-          <div class="text-4xl font-bold lg:text-5xl" style="color: var(--color-text-primary)">
-            {{ device.cpuUsage }}%
-          </div>
-        </div>
+      <!-- ── Monitor Cards (3-col grid) ─────────────────── -->
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-5" data-testid="monitor-cards">
+        <TransactionCard />
+        <NetworkCard />
+        <SystemResourceCard />
       </div>
 
       <!-- ── Hardware Status List ──────────────────────── -->

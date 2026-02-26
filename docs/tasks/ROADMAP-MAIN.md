@@ -85,17 +85,17 @@
 **Goal**: 实现数据监控区三卡片，含 SVG 图表
 
 **Tasks**:
-- [ ] 4.1 `<TransactionCard />`：今日笔数(大号 mono 动态计数)、金额(¥格式)、成功率进度条、响应时长标签、24h SVG 折线迷你图(渐变填充 + hover tooltip)
-- [ ] 4.2 `<NetworkCard />`：延迟值(颜色阈值)、丢包率进度条、DNS/网关连通性检测列表、SVG 半圆仪表盘(指针随延迟旋转)
-- [ ] 4.3 `<SystemResourceCard />`：CPU 圆形进度环(SVG stroke-dasharray, 颜色阈值)、内存水平进度条、磁盘水平进度条、CPU 温度(温度计图标, >70° 红色)
-- [ ] 4.4 三卡片统一样式：`bg-slate-800/60 border-white/6 rounded-2xl`，标题 + 右侧时间戳，3 秒数据波动渐变过渡
-- [ ] 4.5 响应式：宽屏 `grid-cols-3`，竖屏堆叠
+- [x] 4.1 `<TransactionCard />`：今日笔数(大号 mono 动态计数)、金额(¥格式)、成功率进度条、响应时长标签、24h SVG 折线迷你图(渐变填充 + hover tooltip)
+- [x] 4.2 `<NetworkCard />`：延迟值(颜色阈值)、丢包率进度条、DNS/网关连通性检测列表、SVG 半圆仪表盘(指针随延迟旋转)
+- [x] 4.3 `<SystemResourceCard />`：CPU 圆形进度环(SVG stroke-dasharray, 颜色阈值)、内存水平进度条、磁盘水平进度条、CPU 温度(温度计图标, >70° 红色)
+- [x] 4.4 三卡片统一样式：`bg-slate-800/60 border-white/6 rounded-2xl`，标题 + 右侧时间戳，3 秒数据波动渐变过渡
+- [x] 4.5 响应式：宽屏 `grid-cols-3`，竖屏堆叠
 
 **Success Criteria**: 三卡片正确渲染含 SVG 图表，数据每 3 秒波动，动画平滑
 
 **Tests**: 颜色阈值逻辑、数字格式化、SVG 渲染、响应式断点
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
