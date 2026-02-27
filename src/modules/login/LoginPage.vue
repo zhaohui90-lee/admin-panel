@@ -29,20 +29,13 @@ const tabs = [
 ]
 
 // ── Virtual Keyboard ──
-type LoginField = 'staffId' | 'password' | 'cardNumber'
+type LoginField = 'password' | 'cardNumber'
 const kb = useVirtualKeyboard<LoginField>({
-  staffId: { type: 'text', label: '员工工号' },
   password: { type: 'password', label: '登录密码' },
   cardNumber: { type: 'text', label: '卡号' },
 })
 
 // ── Form (proxied to keyboard values) ──
-const staffId = computed({
-  get: () => kb.values.value.staffId,
-  set: (v: string) => {
-    kb.values.value.staffId = v
-  },
-})
 const password = computed({
   get: () => kb.values.value.password,
   set: (v: string) => {
@@ -55,7 +48,7 @@ const error = ref('')
 const shakeError = ref(false)
 const showSuccess = ref(false)
 
-const canLogin = computed(() => staffId.value.trim() !== '' && password.value !== '')
+const canLogin = computed(() => password.value !== '')
 
 function triggerShake() {
   shakeError.value = false
@@ -101,11 +94,7 @@ function switchTab(tab: LoginTab) {
 }
 
 function onKeyboardConfirm() {
-  if (kb.activeField.value === 'staffId') {
-    // Staff ID confirmed → jump to password
-    kb.openKeyboard('password')
-  } else if (kb.activeField.value === 'password') {
-    // Password confirmed → trigger login
+  if (kb.activeField.value === 'password') {
     kb.closeKeyboard()
     handleLogin()
   } else if (kb.activeField.value === 'cardNumber') {
@@ -126,7 +115,6 @@ function simulateCard() {
     cardStatus.value = isSuccess ? 'success' : 'error'
 
     if (isSuccess) {
-      staffId.value = 'EMP20240108'
       showSuccess.value = true
       // Simulate bridge login
       bridge.auth.login('card-auth').then((result) => {
@@ -166,7 +154,6 @@ function resetIdleTimer() {
 
 function dismissTimeout() {
   showTimeout.value = false
-  staffId.value = ''
   password.value = ''
   error.value = ''
   resetIdleTimer()
@@ -185,7 +172,7 @@ onUnmounted(() => {
 })
 
 // Expose for tests
-defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, showTimeout, kb })
+defineExpose({ password, error, showSuccess, activeTab, cardStatus, showTimeout, kb })
 </script>
 
 <template>
@@ -270,60 +257,6 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
 
             <!-- ══════════════ Password Login ══════════════ -->
             <div v-if="activeTab === 'password'" data-testid="mode-password">
-              <!-- Staff ID -->
-              <div class="mb-4">
-                <label
-                  class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2"
-                  >员工工号</label
-                >
-                <div class="relative">
-                  <div
-                    class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                  >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                    >
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
-                    </svg>
-                  </div>
-                  <div
-                    data-testid="input-staff-id"
-                    class="kiosk-input w-full pl-10 pr-10 py-4 rounded-xl text-xs md:text-sm font-medium cursor-pointer select-none min-h-13 flex items-center"
-                    :class="kb.activeField.value === 'staffId' ? 'kiosk-input-focus' : ''"
-                    @click="kb.openKeyboard('staffId')"
-                  >
-                    <span v-if="staffId" class="text-gray-800">{{ staffId }}</span>
-                    <span v-else class="text-slate-400">请输入员工工号</span>
-                  </div>
-                  <button
-                    v-if="staffId"
-                    data-testid="clear-staff-id"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
-                    @click="staffId = ''"
-                  >
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
               <!-- Password -->
               <div class="mb-6">
                 <div class="flex justify-between items-center mb-2">
@@ -398,16 +331,6 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
                     </svg>
                   </button>
                 </div>
-              </div>
-
-              <!-- Status hints -->
-              <div class="flex justify-between mb-4 -mt-4 px-1">
-                <span class="text-[11px] text-gray-400">
-                  {{ staffId ? '工号已填写' : '工号未填写' }}
-                </span>
-                <span class="text-[11px] text-gray-400">
-                  {{ password ? `已输入 ${password.length} 位` : '密码未填写' }}
-                </span>
               </div>
 
               <!-- Error -->
@@ -654,9 +577,7 @@ defineExpose({ staffId, password, error, showSuccess, activeTab, cardStatus, sho
             </svg>
           </div>
           <h2 class="text-xl font-bold text-gray-800 mb-1.5">登录成功</h2>
-          <p class="text-gray-500 text-sm mb-1">
-            欢迎，<span class="text-blue-600 font-bold">{{ staffId || 'Employee' }}</span>
-          </p>
+          <p class="text-gray-500 text-sm mb-1">验证通过，欢迎回来</p>
           <p class="text-gray-400 text-xs mb-5">正在跳转至工作台...</p>
           <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
             <div class="h-full bg-green-400 rounded-full login-load-bar"></div>
