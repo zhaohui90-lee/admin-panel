@@ -123,18 +123,18 @@
 **Goal**: 重构设备控制区和服务地址区
 
 **Tasks**:
-- [ ] 6.1 `<DeviceControlPanel />`：4 个按钮（重启客户端/关闭客户端/关闭终端/重启终端）
-- [ ] 6.2 交互保护：常规操作二次确认(确认/取消双按钮)；高危操作(关闭/重启终端) Modal 强制输入 "CONFIRM"
-- [ ] 6.3 全局加载遮罩：高危操作执行时 `isCriticalActionProcessing = true`，覆盖全页面
-- [ ] 6.4 IPC 通信接口预留（`window.electronAPI.shutdown()` 等桥接方法）
-- [ ] 6.5 `<ServiceEndpointsPanel />`：多个服务地址(业务后端/HIS/支付网关等)、URL + 实时 Ping 延迟显示
-- [ ] 6.6 服务地址编辑：点击编辑唤起虚拟键盘修改 URL
+- [x] 6.1 `<DeviceControlPanel />`：4 个按钮（重启客户端/关闭客户端/关闭终端/重启终端）
+- [x] 6.2 交互保护：常规操作二次确认(确认/取消双按钮)；高危操作(关闭/重启终端) Modal 强制输入 "CONFIRM"
+- [x] 6.3 全局加载遮罩：高危操作执行时 `isCriticalActionProcessing = true`，覆盖全页面
+- [x] 6.4 IPC 通信接口预留（`window.electronAPI.shutdown()` 等桥接方法）
+- [x] 6.5 `<ServiceEndpointsPanel />`：多个服务地址(业务后端/HIS/支付网关等)、URL + 实时 Ping 延迟显示
+- [x] 6.6 服务地址编辑：点击编辑唤起虚拟键盘修改 URL
 
 **Success Criteria**: 控制按钮分级确认正常，高危操作需输入 CONFIRM，服务地址可编辑
 
 **Tests**: 二次确认流程、CONFIRM 输入验证、全局遮罩触发/消除、服务地址 CRUD
 
-**Status**: Not Started
+**Status**: Complete
 
 ---
 
