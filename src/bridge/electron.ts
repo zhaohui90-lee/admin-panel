@@ -7,7 +7,7 @@ import { BridgeError, ErrorCodes } from './types'
  */
 interface AdminAPI {
   closeAdminWindow(): Promise<{ success: boolean; message?: string }>
-  login(password: string): Promise<{ success: boolean; data?: { token: string }; message?: string }>
+  login(password: string): Promise<{ success: boolean; token?: string; message?: string }>
   exitApp(token: string): Promise<{ success: boolean; message?: string }>
   restartApp(token: string): Promise<{ success: boolean; message?: string }>
   systemRestart(token: string): Promise<{ success: boolean; message?: string }>
@@ -71,7 +71,7 @@ export function createElectronBridge(): IBridge {
         if (!result.success) {
           return { success: false }
         }
-        return { success: true, token: result.data?.token }
+        return { success: true, token: result?.token }
       },
     },
 
