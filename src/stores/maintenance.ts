@@ -14,13 +14,7 @@ import type {
 // ── 工具函数 ────────────────────────────────────────
 
 /** 在 [min, max] 范围内对 base 值做随机波动，结果 clamp 到 [floor, ceil] */
-function fluctuate(
-  base: number,
-  min: number,
-  max: number,
-  floor = 0,
-  ceil = Infinity,
-): number {
+function fluctuate(base: number, min: number, max: number, floor = 0, ceil = Infinity): number {
   const delta = min + Math.random() * (max - min)
   return Math.max(floor, Math.min(ceil, Math.round((base + delta) * 100) / 100))
 }
@@ -29,8 +23,7 @@ function fluctuate(
 function generateHourlyTrend(): number[] {
   // 模拟医院交易高峰：8-11点、14-16点
   const pattern = [
-    2, 1, 0, 0, 1, 3, 12, 35, 78, 95, 88, 72,
-    45, 55, 68, 62, 40, 25, 15, 8, 5, 3, 2, 1,
+    2, 1, 0, 0, 1, 3, 12, 35, 78, 95, 88, 72, 45, 55, 68, 62, 40, 25, 15, 8, 5, 3, 2, 1,
   ]
   return pattern.map((v) => v + Math.floor(Math.random() * 10))
 }
@@ -83,22 +76,102 @@ export const useMaintenanceStore = defineStore('maintenance', () => {
 
   // --- 硬件自检 ---
   const hardwareItems = ref<HardwareItem[]>([
-    { id: 'id-reader', name: '身份证读卡器', icon: 'id-card', status: 'ok', detail: '读写正常', lastCheck: new Date().toISOString() },
-    { id: 'med-reader', name: '医保卡读卡器', icon: 'med-card', status: 'ok', detail: '设备通信正常', lastCheck: new Date().toISOString() },
-    { id: 'bank-reader', name: '银行卡读卡器', icon: 'bank-card', status: 'ok', detail: '读写正常', lastCheck: new Date().toISOString() },
-    { id: 'receipt-printer', name: '凭条打印机', icon: 'printer', status: 'warning', detail: '纸张剩余 30%', lastCheck: new Date().toISOString() },
-    { id: 'report-printer', name: '报告打印机', icon: 'printer-report', status: 'ok', detail: '就绪', lastCheck: new Date().toISOString() },
-    { id: 'card-dispenser', name: '发卡模块', icon: 'card-dispenser', status: 'error', detail: '检测到卡道阻塞', lastCheck: new Date().toISOString() },
-    { id: 'scanner', name: '扫码器', icon: 'scanner', status: 'ok', detail: '就绪', lastCheck: new Date().toISOString() },
-    { id: 'face-camera', name: '人脸识别相机', icon: 'camera', status: 'ok', detail: '环境光照良好', lastCheck: new Date().toISOString() },
+    {
+      id: 'id-reader',
+      name: '身份证读卡器',
+      icon: 'id-card',
+      status: 'ok',
+      detail: '读写正常',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'med-reader',
+      name: '医保卡读卡器',
+      icon: 'med-card',
+      status: 'ok',
+      detail: '设备通信正常',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'bank-reader',
+      name: '银行卡读卡器',
+      icon: 'bank-card',
+      status: 'ok',
+      detail: '读写正常',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'receipt-printer',
+      name: '凭条打印机',
+      icon: 'printer',
+      status: 'warning',
+      detail: '纸张剩余 30%',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'report-printer',
+      name: '报告打印机',
+      icon: 'printer-report',
+      status: 'ok',
+      detail: '就绪',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'card-dispenser',
+      name: '发卡模块',
+      icon: 'card-dispenser',
+      status: 'error',
+      detail: '检测到卡道阻塞',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'scanner',
+      name: '扫码器',
+      icon: 'scanner',
+      status: 'ok',
+      detail: '就绪',
+      lastCheck: new Date().toISOString(),
+    },
+    {
+      id: 'face-camera',
+      name: '人脸识别相机',
+      icon: 'camera',
+      status: 'ok',
+      detail: '环境光照良好',
+      lastCheck: new Date().toISOString(),
+    },
   ])
 
   // --- 服务地址 ---
   const serviceEndpoints = ref<ServiceEndpoint[]>([
-    { id: 'backend', label: '业务后端', url: 'https://api.hospital.local:8443', pingMs: 12, editable: true },
-    { id: 'his', label: 'HIS 系统', url: 'https://his.hospital.local:9090', pingMs: 28, editable: true },
-    { id: 'payment', label: '支付网关', url: 'https://pay.hospital.local:443', pingMs: 45, editable: true },
-    { id: 'auth', label: '认证服务', url: 'https://auth.hospital.local:8080', pingMs: 8, editable: false },
+    {
+      id: 'backend',
+      label: '业务后端',
+      url: 'https://api.hospital.local:8443',
+      pingMs: 12,
+      editable: true,
+    },
+    {
+      id: 'his',
+      label: 'HIS 系统',
+      url: 'https://his.hospital.local:9090',
+      pingMs: 28,
+      editable: true,
+    },
+    {
+      id: 'payment',
+      label: '支付网关',
+      url: 'https://pay.hospital.local:443',
+      pingMs: 45,
+      editable: true,
+    },
+    {
+      id: 'auth',
+      label: '认证服务',
+      url: 'https://auth.hospital.local:8080',
+      pingMs: 8,
+      editable: false,
+    },
   ])
 
   // --- 计算属性 ---
