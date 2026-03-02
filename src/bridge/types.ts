@@ -9,6 +9,12 @@ export interface LoginResult {
   token?: string
 }
 
+/** bridge.system.exitPanel */
+export interface ExitPanel {
+  success: boolean
+  message?: string
+}
+
 /** bridge.system.getSystemInfo() 返回的系统信息 */
 export interface SystemInfo {
   cpu: {
@@ -17,11 +23,11 @@ export interface SystemInfo {
   }
   memory: {
     total: number // bytes
-    used: number  // bytes
+    used: number // bytes
   }
   disk: {
     total: number // bytes
-    used: number  // bytes
+    used: number // bytes
   }
   network: {
     ip: string
@@ -113,6 +119,7 @@ export interface IBridge {
   system: {
     getSystemInfo(token: string): Promise<SystemInfo>
     getConfig(token: string): Promise<AppConfig>
+    exitPanel(): Promise<ExitPanel>
   }
   power: {
     restartApp(token: string): Promise<void>

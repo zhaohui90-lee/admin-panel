@@ -1,4 +1,15 @@
-import type { IBridge, SystemInfo, AppConfig, HardwareDeviceInfo, HardwareTestResult, LogEntry, LogLevel, LogQuery, LogPage } from './types'
+import type {
+  IBridge,
+  SystemInfo,
+  AppConfig,
+  HardwareDeviceInfo,
+  HardwareTestResult,
+  LogEntry,
+  LogLevel,
+  LogQuery,
+  LogPage,
+  ExitPanel,
+} from './types'
 
 const MOCK_TOKEN = 'mock-token-' + Math.random().toString(36).slice(2)
 
@@ -87,6 +98,14 @@ export function createMockBridge(): IBridge {
           version: '2.4.0',
         }
       },
+
+      async exitPanel(): Promise<ExitPanel> {
+        await delay(200)
+        return {
+          success: true,
+          message: '',
+        }
+      },
     },
 
     power: {
@@ -159,7 +178,11 @@ export function createMockBridge(): IBridge {
         console.log(`[mock] disconnectDevice: ${deviceId}`)
       },
 
-      async testDevice(_token: string, deviceId: string, command: string): Promise<HardwareTestResult> {
+      async testDevice(
+        _token: string,
+        deviceId: string,
+        command: string,
+      ): Promise<HardwareTestResult> {
         await delay(800)
         console.log(`[mock] testDevice: ${deviceId} -> ${command}`)
         const responses: Record<string, string> = {

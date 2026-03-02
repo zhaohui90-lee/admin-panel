@@ -44,6 +44,7 @@ const password = computed({
 })
 const showPwd = ref(false)
 const isLoading = ref(false)
+const isExiting = ref(false)
 const error = ref('')
 const shakeError = ref(false)
 const showSuccess = ref(false)
@@ -81,6 +82,21 @@ async function handleLogin() {
     triggerShake()
   } finally {
     isLoading.value = false
+  }
+}
+
+async function handleExitPanel() {
+  isExiting.value = true
+  error.value = ''
+
+  try {
+    const result = await bridge.system.exitPanel()
+    // todo 记录结果
+    console.log('exit panel', result)
+  } catch {
+    error.value = '退出失败，请稍后重试'
+  } finally {
+    isExiting.value = false
   }
 }
 
@@ -358,7 +374,7 @@ defineExpose({ password, error, showSuccess, activeTab, cardStatus, showTimeout,
               <button
                 data-testid="btn-login"
                 :disabled="!canLogin || isLoading"
-                class="btn-login w-full py-4 rounded-xl text-white font-bold text-sm tracking-wider flex items-center justify-center gap-2.5"
+                class="btn-login w-full py-4 mb-4 rounded-xl text-white font-bold text-sm tracking-wider flex items-center justify-center gap-2.5"
                 @click="handleLogin"
               >
                 <svg v-if="isLoading" class="login-spinner w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -383,6 +399,23 @@ defineExpose({ password, error, showSuccess, activeTab, cardStatus, showTimeout,
                 >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
+              </button>
+
+              <!-- Exit Button -->
+              <button
+                class="exit-btn w-full py-4 rounded-xl text-white font-bold text-sm tracking-wider flex items-center justify-center gap-2.5"
+                @click="handleExitPanel"
+              >
+                <svg v-if="isExiting" class="login-spinner w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,.3)" stroke-width="3" />
+                  <path
+                    d="M12 2a10 10 0 019.78 12"
+                    stroke="white"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <span>{{ isExiting ? '正在退出...' : '退出' }}</span>
               </button>
             </div>
 
@@ -711,6 +744,12 @@ defineExpose({ password, error, showSuccess, activeTab, cardStatus, showTimeout,
 .btn-login:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ── Exit Button ── */
+.exit-btn {
+  background: linear-gradient(135deg, #e14759, #ed1616);
+  transition: all 0.2s;
 }
 
 /* ── NFC ── */

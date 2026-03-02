@@ -6,13 +6,28 @@ import { BridgeError, ErrorCodes } from './types'
  * 对应 ARCHITECTURE.md 中的 Host Protocol
  */
 interface AdminAPI {
+  closeAdminWindow(): Promise<{ success: boolean; message?: string }>
   login(password: string): Promise<{ success: boolean; data?: { token: string }; message?: string }>
   exitApp(token: string): Promise<{ success: boolean; message?: string }>
   restartApp(token: string): Promise<{ success: boolean; message?: string }>
   systemRestart(token: string): Promise<{ success: boolean; message?: string }>
   systemShutdown(token: string): Promise<{ success: boolean; message?: string }>
-  getConfig(token: string): Promise<{ success: boolean; data?: { serverUrl: string; deviceId: string; version: string }; message?: string }>
-  getSystemInfo(token: string): Promise<{ success: boolean; data?: { cpu: { model: string; usage: number }; memory: { total: number; used: number }; disk: { total: number; used: number }; network: { ip: string; latency: number }; os: { platform: string; version: string; uptime: number } }; message?: string }>
+  getConfig(token: string): Promise<{
+    success: boolean
+    data?: { serverUrl: string; deviceId: string; version: string }
+    message?: string
+  }>
+  getSystemInfo(token: string): Promise<{
+    success: boolean
+    data?: {
+      cpu: { model: string; usage: number }
+      memory: { total: number; used: number }
+      disk: { total: number; used: number }
+      network: { ip: string; latency: number }
+      os: { platform: string; version: string; uptime: number }
+    }
+    message?: string
+  }>
   reloadBusiness(token: string): Promise<{ success: boolean; message?: string }>
 }
 
@@ -66,6 +81,9 @@ export function createElectronBridge(): IBridge {
       },
       async getConfig(token: string) {
         return unwrap(await api.getConfig(token))
+      },
+      async exitPanel() {
+        return unwrap(await api.closeAdminWindow())
       },
     },
 
