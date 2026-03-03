@@ -752,6 +752,22 @@ defineExpose({ password, error, showSuccess, activeTab, cardStatus, showTimeout,
   transition: all 0.2s;
 }
 
+.exit-btn:not(:disabled):hover {
+  background: linear-gradient(135deg, #c2414c, #dc2626);
+  box-shadow: 0 8px 25px -5px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+
+.exit-btn:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.exit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── NFC ── */
 @keyframes nfc-ring {
   0% {
